@@ -7,7 +7,8 @@
     "dev": "nodemon --watch server server/index.js",
     "build": "next build",
     "start": "next start",
-    "kevin": "node ./server/googleDirectionsApi.js"
+    "kevin": "node ./server/googleDirectionsApi.js",
+    "kev2": "node ./server/safetify.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "spherical-geometry-js": "^2.0.0",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {
