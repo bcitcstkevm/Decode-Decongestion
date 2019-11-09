@@ -14,9 +14,7 @@ app
   .then(() => {
     const server = express();
 
-    server.get('*', (req, res) => {
-      return handle(req, res);
-    });
+    const gdaobj = new gda();
 
     server.get('/efficient', (req, res) => {
       const origin = {
@@ -30,13 +28,19 @@ app
         lat: 49.260026,
         lng: -123.245942,
       };
-      // mode and waypoints are optional
-      const gdaobj = new gda(origin, dest, mode, waypoints);
-      //result is an array of objects. each object is a step
-      const result = gdaobj.getListOfDirectionsForEfficient();
 
+      gdaobj.setCVars(origin, dest);
+      // mode and waypoints are optional
+      //result is an array of objects. each object is a step
+      gdaobj.getListOfDirectionsForEfficient().then(result => {
+        res.send(result)
+      })
+    });
+
+    server.get('*', (req, res) => {
       return handle(req, res);
     });
+
 
     server.listen(3000, (err) => {
       if (err) throw err;
