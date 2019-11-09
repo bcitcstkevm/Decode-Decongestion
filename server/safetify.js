@@ -27,6 +27,7 @@ class Safetify {
     await this.setBikeCollisionSteps();
     await this.setInjurySteps();
     this.aggregateDangers();
+    this.normalize();
     return this.arrOfSteps;
   }
 
@@ -96,7 +97,24 @@ class Safetify {
       } catch {}
     });
   }
+
+  normalize() {
+    let max = 0;
+    this.arrOfSteps.forEach((step) => {
+      if(step.danger && step.danger > max) {
+        max = step.danger;
+      }
+    })
+
+    this.arrOfSteps.forEach((step) => {
+      if(step.danger) {
+        step.danger = step.danger / max;
+      }
+    })
+  } 
 }
+
+
 const pointWithinCircle = (point, center, radius) => {
   const dy = Math.pow(Math.abs(point[1] - center.lat), 2);
   const dx = Math.pow(Math.abs(point[0] - center.lng), 2);
