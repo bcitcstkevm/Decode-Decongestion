@@ -1,27 +1,56 @@
 /* eslint-disable */
-// feed in two points and see what we get back
 
-// const API_KEY1 = 'AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA';
-// const API_KEY2 = 'AIzaSyBc2eqMjOT4ph-QZrxPTG3AqS-pWMUBzDc';
-// const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
-// const axios = require('axios');
+const API_KEY = '5b3b85e2e5ef912d9e1c24011e5796a0232d47671a1c7a90b14ebcae';
+const API_PATH = `https://decode-congestion-vancouver.opendatasoft.com/api/records/1.0/search/?dataset=copy-of-city-of-vancouver`;
+const axios = require('axios');
+const testdata = require('./testdata');
 
-module.exports = class googleDirectionsApi {
-  //waypoints is an array of numbers
-  constructor(origin, destination, mode = 'bicycling', waypoints = null) {
-    this.origin = origin;
-    this.destination = destination;
-    this.mode = mode;
-    this.waypoints = waypoints;
+class Safetify {
+  constructor(arrayOfSteps = null, arrOfWarnings = null) {
+    this.arrayOfSteps = arrayOfSteps;
+    this.arrOfWarnings = arrOfWarnings;
   }
 
-  setCVars(o, d, m = 'bicycling', waypoints = null) {
-    this.origin = o;
-    this.destination = d;
-    this.mode = m;
-    this.waypoints = waypoints;
+  setCVars(arrOfSteps, arrOfWarnings) {
+    this.arrOfSteps = arrOfSteps;
+    this.arrOfWarnings = arrOfWarnings;
   }
 
+  getPath() {
+    const key = `&apikey=${API_KEY}`;
+    const row = `&rows=1082`;
+    return `${API_PATH}${key}${row}`;
+  }
+
+  async getSafetifiedSteps() {
+    const path = this.getPath();
+    const options = {
+      method: 'GET',
+      url: path,
+    };
+    const bikeApiResponse = await axios(options);
+    if (bikeApiResponse.status != 200 || bikeApiResponse.statusText !== 'OK') {
+      throw new Error('line 32 safetifyAPI');
+    }
+    const { data } = bikeApiResponse;
+
+    const saftified = [];
+
+    this.arrOfSteps.forEach((step) => {
+      const { lat, lng } = step.start_location;
+      
+    });
+
+    // this.arrOfSteps = this.arrayOfSteps.map((obj)=>{
+    //   obj.
+    // })
+
+    console.log(this.getPath());
+  }
+
+  ping() {
+    console.log('helloworld');
+  }
   //   getWayPoints() {
   //     if (this.waypoints === null) return '';
 
@@ -69,27 +98,12 @@ module.exports = class googleDirectionsApi {
   //     const { steps } = firstLeg;
   //     return steps;
   //   }
-};
+}
 
-// (async () => {
-//   const origin = {
-//     name: undefined,
-//     lat: 49.275802,
-//     lng: -122.94506,
-//   };
+module.exports = Safetify;
 
-//   const dest = {
-//     name: 'UBC',
-//     lat: 49.260026,
-//     lng: -123.245942,
-//   };
-
-//   const x = new googleDirectionsApi(origin, dest, 'bicycling', [
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//   ]);
-//   const res = await x.getListOfDirectionsForEfficient();
-//   console.log(res);
-// })();
+(async () => {
+  const x = new Safetify(testdata);
+  const res = await x.getSafetifiedSteps();
+  // console.log(res);
+})();
