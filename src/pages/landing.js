@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@material-ui/core';
 
 import AutoCompleteInput from '../components/autocomplete';
 import Map from '../components/map/map';
+import { getEfficientPath } from '../utils';
 
 const classes = {
   page: {
@@ -28,9 +29,16 @@ const classes = {
 };
 
 export default function LandingPage({
-  placeA, placeB, setPlaceA, setPlaceB,
+  placeA, placeB, setPlaceA, setPlaceB, finishFetch, changePage, setFastestRoute,
 }) {
   const [toggleMap, setToggleMap] = useState(false);
+
+  useEffect(() => {
+    if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
+      changePage();
+      getEfficientPath(finishFetch, setFastestRoute);
+    }
+  }, [placeA, placeB]);
 
   return (
     <div style={classes.page}>
@@ -73,5 +81,7 @@ LandingPage.propTypes = {
   placeB: PropTypes.shape({}).isRequired,
   setPlaceA: PropTypes.func.isRequired,
   setPlaceB: PropTypes.func.isRequired,
-}
-
+  finishFetch: PropTypes.func.isRequired,
+  changePage: PropTypes.func.isRequired,
+  setFastestRoute: PropTypes.func.isRequired,
+};
