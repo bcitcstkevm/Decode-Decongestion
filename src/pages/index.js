@@ -52,6 +52,11 @@ export default function Index() {
       >
         Click here to select from map
       </p>
+      <button onClick={() => {
+        fetch('/efficient')
+        .then(response => response.json())
+        .then(response => console.log(response))
+      }}>LOOL</button>
       <Map
         placeA={placeA}
         placeB={placeB}
