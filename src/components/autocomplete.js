@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Autocomplete } from '@react-google-maps/api';
-import { TextField} from '@material-ui/core';
+import { TextField } from '@material-ui/core';
 
 export default function AutoCompleteInput({
   value, handleChange,
@@ -14,3 +15,8 @@ export default function AutoCompleteInput({
     </Autocomplete>
   );
 }
+
+AutoCompleteInput.propTypes = {
+  value: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+};
