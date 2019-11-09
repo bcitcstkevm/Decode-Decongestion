@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --watch server server/index.js",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "kevin": "node ./server/googleDirectionsApi.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   "homepage": "https://github.com/bcitcstkevm/Decode-Decongestion#readme",
   "dependencies": {
     "@react-google-maps/api": "^1.7.9",
+    "axios": "^0.19.0",
     "express": "^4.17.1",
     "next": "^9.1.3",
     "react": "^16.11.0",
