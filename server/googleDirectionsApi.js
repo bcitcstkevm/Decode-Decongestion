@@ -73,20 +73,20 @@ class googleDirectionsApi {
   }
 }
 
-(async () => {
-  const origin = {
-    name: undefined,
-    lat: 49.275802,
-    lng: -122.945060
-  }
+// (async () => {
+//   const origin = {
+//     name: undefined,
+//     lat: 49.275802,
+//     lng: -122.945060
+//   }
 
-  const dest = {
-    name: 'UBC',
-    lat: 49.260026,
-    lng: -123.245942
-  }
+//   const dest = {
+//     name: 'UBC',
+//     lat: 49.260026,
+//     lng: -123.245942
+//   }
 
-  const x = new googleDirectionsApi(origin, dest, "bicycling", [['49.259564', '-123.070240'], ['49.259564', '-123.070240'], ['49.259564', '-123.070240'], ['49.259564', '-123.070240']]);
-  const res = await x.getListOfDirectionsForEfficient();
-  console.log(res);
-})();
+//   const x = new googleDirectionsApi(origin, dest, "bicycling", [['49.259564', '-123.070240'], ['49.259564', '-123.070240'], ['49.259564', '-123.070240'], ['49.259564', '-123.070240']]);
+//   const res = await x.getListOfDirectionsForEfficient();
+//   console.log(res);
+// })();
