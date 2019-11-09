@@ -2,11 +2,6 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types'
 import { GoogleMap, Marker } from '@react-google-maps/api'
 
-const mapContainerStyle = {
-  height: '500px', // TODO: fix this
-  width: '100%'
-}
-
 const INITIAL_CENTER = {lat: 49.2577143, lng: -123.1939432}
 
 export default class Map extends React.Component {
@@ -31,12 +26,11 @@ export default class Map extends React.Component {
   }
 
   render(){
-    const {  } = this.state
-    const { placeA, placeB } = this.props
+    const { placeA, placeB, style } = this.props
     return (
       <GoogleMap
         id='map'
-        mapContainerStyle={mapContainerStyle}
+        mapContainerStyle={style}
         center={INITIAL_CENTER}
         zoom={12}
         onClick={this.handleClick.bind(this)}
@@ -44,10 +38,10 @@ export default class Map extends React.Component {
           this.mapRef = ref
         }}
       >
-        {placeA && <Marker
+        {placeA.lat && <Marker
           position={placeA}
         />}
-        {placeB && <Marker
+        {placeB.lat && <Marker
           position={placeB}
         />}
       </GoogleMap>
@@ -56,8 +50,8 @@ export default class Map extends React.Component {
 }
 
 Map.propTypes = {
-  placeA: PropTypes.object,
-  placeB: PropTypes.object,
+  placeA: PropTypes.shape({}).isRequired,
+  placeB: PropTypes.shape({}).isRequired,
   setPlaceA: PropTypes.func.isRequired,
   setPlaceB: PropTypes.func.isRequired,
 }
