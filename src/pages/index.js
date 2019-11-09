@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 
 import LandingPage from './landing';
+import ResultsPage from './results';
 
 const PAGE_STATES = {
   LANDING: 'landing',
@@ -11,12 +12,17 @@ const PAGE_STATES = {
 };
 
 export default function Index() {
-
   const [placeA, setPlaceA] = useState({ name: '' });
   const [placeB, setPlaceB] = useState({ name: '' });
   const [pageState, setPageState] = useState(PAGE_STATES.LANDING);
 
-  const [toggleMap, setToggleMap] = useState(false);
+  const [fetchingData, setFetchingData] = useState(false);
+  const [fastestRoute, setFastestRoute] = useState([]);
+
+  const changeToResultsPage = () => {
+    setFetchingData(true);
+    setPageState(PAGE_STATES.RESULTS);
+  }
 
   return (
     <div>
@@ -32,6 +38,13 @@ export default function Index() {
           placeB={placeB}
           setPlaceA={setPlaceA}
           setPlaceB={setPlaceB}
+          changePage={changeToResultsPage}
+          finishFetch={() => setFetchingData(false)}
+          setFastestRoute={(route) => setFastestRoute(route)}
+        />,
+        [PAGE_STATES.RESULTS]: <ResultsPage
+          fetchingData={fetchingData}
+          fastestRoute={fastestRoute}
         />,
       }[pageState]}
     </div>

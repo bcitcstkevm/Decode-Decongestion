@@ -29,7 +29,7 @@ export default class AutoCompleteInput extends Component {
         name: place.name,
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
-      })
+      });
     } else {
       console.log('Autocomplete is not loaded yet!');
     }
