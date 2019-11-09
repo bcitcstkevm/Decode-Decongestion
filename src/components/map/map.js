@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types'
-import { GoogleMap, Marker } from '@react-google-maps/api'
+import { GoogleMap, Marker, Polyline } from '@react-google-maps/api'
+import { getEfficientPath } from '../../utils'
 
 const INITIAL_CENTER = {lat: 49.2577143, lng: -123.1939432}
 
@@ -9,7 +10,7 @@ export default class Map extends React.Component {
     super(props)
 
     this.state = {
-      center: INITIAL_CENTER
+      path: [],
     }
     this.mapRef
   }
@@ -22,11 +23,14 @@ export default class Map extends React.Component {
       this.props.setPlaceA({name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng})
     } else {
       this.props.setPlaceB({name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng})
+
     }
   }
 
   render(){
+    const { path } = this.state
     const { placeA, placeB, style } = this.props
+    console.log(path)
     return (
       <GoogleMap
         id='map'
@@ -44,6 +48,16 @@ export default class Map extends React.Component {
         {placeB.lat && <Marker
           position={placeB}
         />}
+        {path && path.map((line, i) => {
+          const { start_location, end_location } = line
+          return <Polyline
+            key={i}
+            path={[
+              {lat: start_location.lat, lng: start_location.lng},
+              {lat: end_location.lat, lng: end_location.lng},
+            ]}
+          />
+        })}
       </GoogleMap>
       )
   }
