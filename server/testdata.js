@@ -1,5 +1,5 @@
 /* eslint-disable */
-module.export = [
+module.exports = [
   {
     distance: {
       text: '0.2 km',

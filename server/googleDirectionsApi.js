@@ -4,7 +4,7 @@ const API_KEY1 = 'AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA';
 const API_KEY2 = 'AIzaSyBc2eqMjOT4ph-QZrxPTG3AqS-pWMUBzDc';
 const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
 const axios = require('axios');
-// const safe = require('./safetify');
+const safe = require('./safetify');
 
 class googleDirectionsApi {
   //waypoints is an array of numbers
@@ -13,7 +13,7 @@ class googleDirectionsApi {
     this.destination = destination;
     this.mode = mode;
     this.waypoints = waypoints;
-    // this.safetify = new safe();
+    this.safetify = new safe();
   }
 
   setCVars(o, d, m = 'bicycling', waypoints = null) {
@@ -60,9 +60,9 @@ class googleDirectionsApi {
       throw new Error('line 35 google directions API');
     }
     const { steps, warnings } = this.parseResponseV1(res.data);
-    // this.safetify.setCVars(steps, warnings);
-    // const result = await this.safetify.getSafetifiedSteps();
-    return steps;
+    this.safetify.setCVars(steps, warnings);
+    const result = await this.safetify.getSafetifiedSteps();
+    return result;
   }
   parseResponseV1(data) {
     const { routes } = data;
@@ -76,25 +76,25 @@ class googleDirectionsApi {
 
 module.exports = googleDirectionsApi;
 
-(async () => {
-  const origin = {
-    name: undefined,
-    lat: 49.275802,
-    lng: -122.94506,
-  };
+// (async () => {
+//   const origin = {
+//     name: undefined,
+//     lat: 49.275802,
+//     lng: -122.94506,
+//   };
 
-  const dest = {
-    name: 'UBC',
-    lat: 49.260026,
-    lng: -123.245942,
-  };
+//   const dest = {
+//     name: 'UBC',
+//     lat: 49.260026,
+//     lng: -123.245942,
+//   };
 
-  const x = new googleDirectionsApi(origin, dest, 'bicycling', [
-    ['49.259564', '-123.070240'],
-    ['49.259564', '-123.070240'],
-    ['49.259564', '-123.070240'],
-    ['49.259564', '-123.070240'],
-  ]);
-  const res = await x.getPath();
-  console.log(JSON.stringify(res));
-})();
+//   const x = new googleDirectionsApi(origin, dest, 'bicycling', [
+//     ['49.259564', '-123.070240'],
+//     ['49.259564', '-123.070240'],
+//     ['49.259564', '-123.070240'],
+//     ['49.259564', '-123.070240'],
+//   ]);
+//   const res = await x.getListOfDirectionsForEfficient();
+//   console.log(JSON.stringify(res));
+// })();
