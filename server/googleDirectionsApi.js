@@ -6,7 +6,7 @@ const API_KEY2 = 'AIzaSyBc2eqMjOT4ph-QZrxPTG3AqS-pWMUBzDc';
 const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
 const axios = require('axios');
 
-class googleDirectionsApi {
+export default class googleDirectionsApi {
   //waypoints is an array of numbers
   constructor(origin, destination, mode = 'bicycling', waypoints = null) {
     this.origin = origin;
