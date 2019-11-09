@@ -1,28 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { Button } from '@material-ui/core';
 
-import LandingPage from './landing';
-import ResultsPage from './results';
+import AutoCompleteInput from '../components/autocomplete';
+import Map from '../components/map/map';
+import { getEfficientPath } from '../utils';
 
-const PAGE_STATES = {
-  LANDING: 'landing',
-  LOADING: 'loading',
-  RESULTS: 'results',
-  SIMULATION: 'simulation',
+const classes = {
+  page: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  logo: {
+    backgroundColor: 'black',
+    width: '200px',
+    height: '200px',
+  },
+  inputs: {
+    zIndex: 13,
+  },
+  map: {
+    position: 'absolute',
+    zIndex: 10,
+    height: '100vh',
+    width: '100vw',
+  },
+  modal: {
+    position: 'absolute',
+  },
 };
 
 export default function Index() {
   const [placeA, setPlaceA] = useState({ name: '' });
   const [placeB, setPlaceB] = useState({ name: '' });
-  const [pageState, setPageState] = useState(PAGE_STATES.LANDING);
+  const [toggleMap, setToggleMap] = useState(false);
 
   const [fetchingData, setFetchingData] = useState(false);
   const [fastestRoute, setFastestRoute] = useState([]);
 
-  const changeToResultsPage = () => {
-    setFetchingData(true);
-    setPageState(PAGE_STATES.RESULTS);
-  }
+  useEffect(() => {
+    if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
+      setFetchingData(true);
+      getEfficientPath(() => setFetchingData(false), setFastestRoute);
+    }
+  }, [placeA, placeB]);
 
   return (
     <div>
@@ -32,21 +54,44 @@ export default function Index() {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.css"></link>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA&libraries=places"></script>
       </Head>
-      {{
-        [PAGE_STATES.LANDING]: <LandingPage
-          placeA={placeA}
-          placeB={placeB}
-          setPlaceA={setPlaceA}
-          setPlaceB={setPlaceB}
-          changePage={changeToResultsPage}
-          finishFetch={() => setFetchingData(false)}
-          setFastestRoute={(route) => setFastestRoute(route)}
-        />,
-        [PAGE_STATES.RESULTS]: <ResultsPage
-          fetchingData={fetchingData}
-          fastestRoute={fastestRoute}
-        />,
-      }[pageState]}
+      <div style={classes.page}>
+        {!toggleMap && (<div style={classes.logo} />)}
+
+        <div style={classes.inputs}>
+          <AutoCompleteInput
+            value={placeA}
+            handleChange={setPlaceA}
+          />
+          <AutoCompleteInput
+            value={placeB}
+            handleChange={setPlaceB}
+          />
+        </div>
+
+        {!toggleMap && (
+          <Button
+            onClick={() => setToggleMap(!toggleMap)}
+          >
+            Click to view map
+          </Button>
+        )}
+        {toggleMap && (
+          <Map
+            style={classes.map}
+            placeA={placeA}
+            placeB={placeB}
+            setPlaceA={setPlaceA}
+            setPlaceB={setPlaceB}
+          />
+        )}
+
+
+        {fetchingData && (
+          <div style={classes.modal}>
+            Loading
+          </div>
+        )}
+      </div>
     </div>
   );
 }
