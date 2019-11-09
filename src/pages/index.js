@@ -23,8 +23,11 @@ const useStyles = makeStyles({
 export default function Index() {
   const classes = useStyles();
 
-  const [placeA, setPlaceA] = useState('');
-  const [placeB, setPlaceB] = useState('');
+  const [placeA, setPlaceA] = useState({ name: '' });
+  const [placeB, setPlaceB] = useState({ name: '' });
+  const [placeHolder, setPlaceHolder] = useState('');
+
+  const [toggleMap, setToggleMap] = useState(false);
 
   return (
     <Root>
@@ -34,6 +37,7 @@ export default function Index() {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.css"></link>
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA&libraries=places"></script>
       </Head>
+
       <h2>Header</h2>
       <AutoCompleteInput
         value={placeA}
@@ -42,8 +46,14 @@ export default function Index() {
       <AutoCompleteInput
         value={placeB}
         handleChange={setPlaceB}
+
       />
-      <p>Click here to select from map</p>
+      <p
+        onClick={() => setToggleMap(!toggleMap)}
+      >
+        Click here to select from map
+      </p>
+
     </Root>
   );
 }
