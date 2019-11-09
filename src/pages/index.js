@@ -97,9 +97,7 @@ export default function Index() {
             fastestRoute={fastestRoute}
           />
         )}
-
-
-<<<<<<< HEAD
+        
         {fetchingData && (
           <div style={classes.modal}>
             Loading
@@ -107,13 +105,5 @@ export default function Index() {
         )}
       </div>
     </div>
-=======
-      <h2>Header</h2>
-      <AutoCompleteInput value={placeA} handleChange={setPlaceA} />
-      <AutoCompleteInput value={placeB} handleChange={setPlaceB} />
-      <p onClick={() => setToggleMap(!toggleMap)}>Click here to select from map</p>
-      <Map placeA={placeA} placeB={placeB} setPlaceA={setPlaceA} setPlaceB={setPlaceB} />
-    </Root>
->>>>>>> more streetview progress
   );
 }
