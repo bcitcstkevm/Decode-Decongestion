@@ -41,8 +41,12 @@ export default function Index() {
 
   useEffect(() => {
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
-      setFetchingData(true);
-      getEfficientPath(() => setFetchingData(false), setFastestRoute);
+      setToggleMap(true)
+      setFetchingData(true)
+      getEfficientPath(placeA, placeB, result => {
+        setFetchingData(false)
+        setFastestRoute(result)
+      })
     }
   }, [placeA, placeB]);
 
@@ -82,6 +86,7 @@ export default function Index() {
             placeB={placeB}
             setPlaceA={setPlaceA}
             setPlaceB={setPlaceB}
+            fastestRoute={fastestRoute}
           />
         )}
 

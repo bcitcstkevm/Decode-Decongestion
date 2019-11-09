@@ -10,7 +10,6 @@ export default class Map extends React.Component {
     super(props)
 
     this.state = {
-      path: [],
       mobiBikes: [],
     }
     this.mapRef
@@ -38,9 +37,8 @@ export default class Map extends React.Component {
   }
 
   render(){
-    const { path, mobiBikes } = this.state
-    const { placeA, placeB, style } = this.props
-    console.log(mobiBikes)
+    const { mobiBikes } = this.state
+    const { placeA, placeB, style, fastestRoute } = this.props
     return (
       <GoogleMap
         id='map'
@@ -58,7 +56,7 @@ export default class Map extends React.Component {
         {placeB.lat && <Marker
           position={placeB}
         />}
-        {path && path.map((line, i) => {
+        {fastestRoute && fastestRoute.map((line, i) => {
           const { start_location, end_location } = line
           return <Polyline
             key={i}
@@ -70,6 +68,7 @@ export default class Map extends React.Component {
         })}
         {mobiBikes && mobiBikes.map((station, i) => {
           const { geopoint } = station
+          if (!geopoint) return
           const loc = {
             lat: geopoint[0],
             lng: geopoint[1]
@@ -90,4 +89,5 @@ Map.propTypes = {
   placeB: PropTypes.shape({}).isRequired,
   setPlaceA: PropTypes.func.isRequired,
   setPlaceB: PropTypes.func.isRequired,
+  fastestRoute: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 }

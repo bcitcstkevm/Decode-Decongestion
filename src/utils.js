@@ -1,10 +1,8 @@
-export function getEfficientPath(callback, callback2) {
-  console.log('called')
-  fetch('/efficient')
+export function getEfficientPath(pointA, pointB, callback) {
+  fetch(`/efficient?pointAName=${pointA.name}&pointALat=${pointA.lat}&pointALng=${pointA.lng}&pointBName=${pointB.name}&pointBLat=${pointB.lat}&pointBLng=${pointB.lng}`)
   .then(response => response.json())
   .then(response => {
-    callback();
-    callback2(response);
+    callback(response);
   });
 }
 
