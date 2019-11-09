@@ -1,6 +1,7 @@
 import React from 'react'
 import { GoogleMap, LoadScript } from '@react-google-maps/api'
 import Head from 'next/head'
+import { displayPano } from '../scripts/pannellum'
 
 const Index = () => (
   <div style={{display: 'flex', flex: 1, height: '100vh'}}>
