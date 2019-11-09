@@ -8,6 +8,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const gda = require('./googleDirectionsApi');
+const mobi = require('./mobiBike')
 
 app
   .prepare()
@@ -16,17 +17,23 @@ app
 
     const gdaobj = new gda();
 
+    server.get('/api/getMobi', (req, res) => {
+      mobi.getMobiBikeStation().then(result => {
+        res.send(result)
+      })
+    })
+
     server.get('/efficient', (req, res) => {
       const origin = {
-        name: undefined,
-        lat: 49.275802,
-        lng: -122.94506,
+        name: req.query.pointAName,
+        lat: req.query.pointALat,
+        lng: req.query.pointALng,
       };
 
       const dest = {
-        name: 'UBC',
-        lat: 49.260026,
-        lng: -123.245942,
+        name: req.query.pointBName,
+        lat: req.query.pointBLat,
+        lng: req.query.pointBLng,
       };
 
       gdaobj.setCVars(origin, dest);

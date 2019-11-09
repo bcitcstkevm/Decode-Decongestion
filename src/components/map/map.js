@@ -1,11 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types'
-import { GoogleMap, Marker } from '@react-google-maps/api'
-
-const mapContainerStyle = {
-  height: '500px', // TODO: fix this
-  width: '100%'
-}
+import { GoogleMap, Marker, Polyline, Circle } from '@react-google-maps/api'
+import { getMobi } from '../../utils'
 
 const INITIAL_CENTER = {lat: 49.2577143, lng: -123.1939432}
 
@@ -14,9 +10,18 @@ export default class Map extends React.Component {
     super(props)
 
     this.state = {
-      center: INITIAL_CENTER
+      mobiBikes: [],
     }
     this.mapRef
+  }
+
+  componentDidMount() {
+    getMobi(result => {
+      console.log(result)
+      this.setState({
+        mobiBikes: result
+      })
+    })
   }
 
   handleClick(e) {
@@ -27,16 +32,17 @@ export default class Map extends React.Component {
       this.props.setPlaceA({name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng})
     } else {
       this.props.setPlaceB({name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng})
+
     }
   }
 
   render(){
-    const {  } = this.state
-    const { placeA, placeB } = this.props
+    const { mobiBikes } = this.state
+    const { placeA, placeB, style, fastestRoute } = this.props
     return (
       <GoogleMap
         id='map'
-        mapContainerStyle={mapContainerStyle}
+        mapContainerStyle={style}
         center={INITIAL_CENTER}
         zoom={12}
         onClick={this.handleClick.bind(this)}
@@ -44,20 +50,44 @@ export default class Map extends React.Component {
           this.mapRef = ref
         }}
       >
-        {placeA && <Marker
+        {placeA.lat && <Marker
           position={placeA}
         />}
-        {placeB && <Marker
+        {placeB.lat && <Marker
           position={placeB}
         />}
+        {fastestRoute && fastestRoute.map((line, i) => {
+          const { start_location, end_location } = line
+          return <Polyline
+            key={i}
+            path={[
+              {lat: start_location.lat, lng: start_location.lng},
+              {lat: end_location.lat, lng: end_location.lng},
+            ]}
+          />
+        })}
+        {mobiBikes && mobiBikes.map((station, i) => {
+          const { geopoint } = station
+          if (!geopoint) return
+          const loc = {
+            lat: geopoint[0],
+            lng: geopoint[1]
+          }
+          return <Circle
+            key={i}
+            center={loc}
+            radius={100}
+          />
+        })}
       </GoogleMap>
       )
   }
 }
 
 Map.propTypes = {
-  placeA: PropTypes.object,
-  placeB: PropTypes.object,
+  placeA: PropTypes.shape({}).isRequired,
+  placeB: PropTypes.shape({}).isRequired,
   setPlaceA: PropTypes.func.isRequired,
   setPlaceB: PropTypes.func.isRequired,
+  fastestRoute: PropTypes.arrayOf(PropTypes.shape({})).isRequired
 }

@@ -6,7 +6,7 @@ const apiKey = `c680927187f8fc8f11b96b36d7b0d49675a7dee21c2ff0f7a527b806`;
 const getMobiBikeStation = async () => {
     const stationData = [];
 
-    const path = `${url}&apikey=${apiKey}`;
+    const path = `${url}&apikey=${apiKey}&rows=100`;
     const result = await axios.get(path);
     const records = result.data.records;
     records.forEach(dataObject => {
@@ -41,3 +41,7 @@ const getNearestBikeStation = async (origin, distance = 5) => {
 // }
 
 // getNearestBikeStation(origin);
+
+module.exports = {
+    getMobiBikeStation,
+}
