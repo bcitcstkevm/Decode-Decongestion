@@ -140,6 +140,9 @@ export default class Map extends React.Component {
                     { lat: end_location.lat, lng: end_location.lng },
                   ]}
                   onClick={e => this.handleLineClick(e, line)}
+                  options={{
+                    strokeColor: `rgb(${255 * line.danger}, ${255*(1-line.danger)}, 0)`,
+                  }}
                 />
               );
             })}

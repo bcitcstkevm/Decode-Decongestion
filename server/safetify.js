@@ -27,6 +27,7 @@ class Safetify {
     await this.setBikeCollisionSteps();
     await this.setInjurySteps();
     this.aggregateDangers();
+    this.normalize();
     return this.arrOfSteps;
   }
 
@@ -45,9 +46,6 @@ class Safetify {
 
   async setInjurySteps() {
     const { records } = await this.executeFetch('vpd-fatalities-2006-aug-22-2019');
-
-    // console.log(JSON.stringify(records));
-
     this.arrOfSteps.forEach((step) => {
       const distanceFromOrigin = 1; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
@@ -97,30 +95,36 @@ class Safetify {
         }
         step.danger = step.bikeCollisions + step.fatalities;
       } catch {}
-      console.log(step.danger);
     });
   }
 
-  ping() {
-    console.log('helloworld');
-  }
+  normalize() {
+    let max = 0;
+    this.arrOfSteps.forEach((step) => {
+      if(step.danger && step.danger > max) {
+        max = step.danger;
+      }
+    })
+
+    this.arrOfSteps.forEach((step) => {
+      if(step.danger) {
+        step.danger = step.danger / max;
+      }
+    })
+  } 
 }
+
+
 const pointWithinCircle = (point, center, radius) => {
-  // console.log(`${point[1]}, ${center.lat}`)
   const dy = Math.pow(Math.abs(point[1] - center.lat), 2);
   const dx = Math.pow(Math.abs(point[0] - center.lng), 2);
   const r = Math.pow(radius, 2);
-
-  // console.log(`${dy} + ${dx} < ${r}`)
-
   return dx + dy < r;
 };
 
 module.exports = Safetify;
 
 // (async () => {
-//   // console.log(testdata);
 //   const x = new Safetify(testdata);
 //   const res = await x.getSafetifiedSteps();
-//   // console.log(res);
 // })();
