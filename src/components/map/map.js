@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GoogleMap, Marker, Polyline, Circle } from '@react-google-maps/api';
+import { GoogleMap, Marker, Polyline, Circle, InfoWindow } from '@react-google-maps/api';
 import { getMobi } from '../../utils';
 import StreetView from './streetview';
 import { computeHeading } from 'spherical-geometry-js';
@@ -24,6 +24,7 @@ export default class Map extends React.Component {
       center: INITIAL_CENTER,
       streetViewVisibility: false,
       streetViewHeading: 0,
+      infoBox: null
     };
     this.mapRef;
   }
@@ -73,7 +74,6 @@ export default class Map extends React.Component {
 
   componentDidMount() {
     getMobi((result) => {
-      console.log(result);
       this.setState({
         mobiBikes: result,
       });
@@ -83,7 +83,12 @@ export default class Map extends React.Component {
   handleClick(e) {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
-    const { placeA } = this.props;
+    const { placeA, placeB } = this.props;
+    this.setState({infoBox: null})
+    if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
+      return
+    }
+
     if (Object.keys(placeA).length !== 3) {
       this.props.setPlaceA({ name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng });
     } else {
@@ -91,8 +96,21 @@ export default class Map extends React.Component {
     }
   }
 
+  handleLineClick(e, line) {
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+    this.setState({
+      infoBox: {
+        lat,
+        lng,
+        line
+      }
+    })
+    console.log(line)
+  }
+
   render() {
-    const { mobiBikes } = this.state;
+    const { mobiBikes, infoBox } = this.state;
     const { placeA, placeB, style, fastestRoute } = this.props;
     return (
       <div>
@@ -121,6 +139,7 @@ export default class Map extends React.Component {
                     { lat: start_location.lat, lng: start_location.lng },
                     { lat: end_location.lat, lng: end_location.lng },
                   ]}
+                  onClick={e => this.handleLineClick(e, line)}
                 />
               );
             })}
@@ -133,7 +152,18 @@ export default class Map extends React.Component {
                 lng: geopoint[1],
               };
               return <Circle key={i} center={loc} radius={100} />;
-            })}
+          })}
+          {infoBox && <InfoWindow
+            position={{lat: infoBox.lat, lng: infoBox.lng}}
+            onCloseClick={() => this.setState({infoBox: null})}
+          >
+            <div style={{ backgroundColor: 'yellow', opacity: 0.75, padding: 12 }}>
+              <div style={{ fontSize: 16, fontColor: `#08233B` }}>
+                <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
+                <span>Fatalities: {infoBox.line.fatalities}</span>
+              </div>
+            </div>
+          </InfoWindow>}
           <StreetView
             currentPosition={this.state.current_position}
             positions={this.state.positions}
