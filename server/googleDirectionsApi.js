@@ -69,7 +69,7 @@ module.exports = class googleDirectionsApi {
     const { steps } = firstLeg;
     return steps;
   }
-}
+};
 
 // (async () => {
 //   const origin = {
