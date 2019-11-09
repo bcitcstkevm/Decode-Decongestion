@@ -8,6 +8,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const gda = require('./googleDirectionsApi');
+const mobi = require('./mobiBike')
 
 app
   .prepare()
@@ -15,6 +16,12 @@ app
     const server = express();
 
     const gdaobj = new gda();
+
+    server.get('/api/getMobi', (req, res) => {
+        mobi.getMobiBikeStation().then(result => {
+            res.send(result)
+        })
+    })
 
     server.get('/efficient', (req, res) => {
       const origin = {

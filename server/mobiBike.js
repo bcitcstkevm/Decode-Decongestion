@@ -41,3 +41,7 @@ const getNearestBikeStation = async (origin, distance = 5) => {
 // }
 
 // getNearestBikeStation(origin);
+
+module.exports = {
+    getMobiBikeStation,
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types'
-import { GoogleMap, Marker, Polyline } from '@react-google-maps/api'
-import { getEfficientPath } from '../../utils'
+import { GoogleMap, Marker, Polyline, Circle } from '@react-google-maps/api'
+import { getMobi } from '../../utils'
 
 const INITIAL_CENTER = {lat: 49.2577143, lng: -123.1939432}
 
@@ -11,8 +11,18 @@ export default class Map extends React.Component {
 
     this.state = {
       path: [],
+      mobiBikes: [],
     }
     this.mapRef
+  }
+
+  componentDidMount() {
+    getMobi(result => {
+      console.log(result)
+      this.setState({
+        mobiBikes: result
+      })
+    })
   }
 
   handleClick(e) {
@@ -28,9 +38,9 @@ export default class Map extends React.Component {
   }
 
   render(){
-    const { path } = this.state
+    const { path, mobiBikes } = this.state
     const { placeA, placeB, style } = this.props
-    console.log(path)
+    console.log(mobiBikes)
     return (
       <GoogleMap
         id='map'
@@ -56,6 +66,18 @@ export default class Map extends React.Component {
               {lat: start_location.lat, lng: start_location.lng},
               {lat: end_location.lat, lng: end_location.lng},
             ]}
+          />
+        })}
+        {mobiBikes && mobiBikes.map((station, i) => {
+          const { geopoint } = station
+          const loc = {
+            lat: geopoint[0],
+            lng: geopoint[1]
+          }
+          return <Circle
+            key={i}
+            center={loc}
+            radius={100}
           />
         })}
       </GoogleMap>
