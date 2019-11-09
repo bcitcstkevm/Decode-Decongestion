@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { GoogleMap, Marker, Polyline, Circle } from '@react-google-maps/api';
 import { getMobi } from '../../utils';
 import StreetView from './streetview';
+import { computeHeading } from 'spherical-geometry-js';
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
@@ -13,31 +14,46 @@ export default class Map extends React.Component {
     this.state = {
       mobiBikes: [],
       positions: [
-        { lat: 49.225769, lng: -123.077244, pov: { heading: 165, pitch: 0 } },
-        { lat: 49.226604, lng: -123.077339, pov: { heading: 20, pitch: 0 } },
-        { lat: 49.227502, lng: -123.077307, pov: { heading: 50, pitch: 0 } },
-        { lat: 49.2276733, lng: -123.0769295, pov: { heading: 140, pitch: 0 } },
-        { lat: 49.228441, lng: -123.077212, pov: { heading: 0, pitch: 0 } },
-        { lat: 49.22936, lng: -123.077052, pov: { heading: 165, pitch: 0 } },
-        { lat: 49.230445, lng: -123.077212, pov: { heading: 165, pitch: 0 } },
+        { lat: 49.225769, lng: -123.077244 },
+        { lat: 49.226604, lng: -123.077339 },
+        { lat: 49.227502, lng: -123.077307 },
+        { lat: 49.2276733, lng: -123.0769295 },
+        { lat: 49.2276835, lng: -123.0765166 },
       ],
       current_position: 0,
       center: INITIAL_CENTER,
       streetViewVisibility: false,
+      streetViewHeading: 0,
     };
     this.mapRef;
+  }
+
+  componentDidMount() {
+    const initialHeading = computeHeading(this.state.positions[0], this.state.positions[1]);
+    console.log('initialHeading', initialHeading);
+    this.setState((prevState) => {
+      return { ...prevState, streetViewHeading: initialHeading };
+    });
   }
 
   nextStreetViewPosition() {
     console.log('state', this.state);
 
-    let newPosition =
+    const newPosition =
       this.state.current_position + 1 > this.state.positions.length
         ? this.state.positions.length
         : this.state.current_position + 1;
+
+    let newHeading =
+      newPosition === this.state.current_position
+        ? this.state.streetViewHeading
+        : computeHeading(this.state.positions[this.state.current_position], this.state.positions[newPosition]);
+
+    console.log('newHeading', newHeading);
     this.setState((prevState) => {
-      return { ...prevState, current_position: newPosition };
+      return { ...prevState, current_position: newPosition, streetViewHeading: newHeading };
     });
+    console.log('newHeading state', this.state);
   }
 
   prevStreetViewPosition() {
@@ -122,6 +138,7 @@ export default class Map extends React.Component {
             currentPosition={this.state.current_position}
             positions={this.state.positions}
             visbility={this.state.streetViewVisibility}
+            heading={this.state.streetViewHeading}
           />
         </GoogleMap>
       </div>

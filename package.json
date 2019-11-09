@@ -29,6 +29,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
+    "spherical-geometry-js": "^2.0.0",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {
