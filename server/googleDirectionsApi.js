@@ -47,8 +47,8 @@ class googleDirectionsApi {
   }
 }
 
-(async () => {
-  const x = new googleDirectionsApi("a", "b");
-  const res = await x.getListOfDirections();
-  console.log(res);
-})();
+// (async () => {
+//   const x = new googleDirectionsApi("a", "b");
+//   const res = await x.getListOfDirections();
+//   console.log(res);
+// })();
