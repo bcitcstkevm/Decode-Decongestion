@@ -6,9 +6,7 @@ import { getMobi } from '../../utils';
 import StreetView from './streetview';
 import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
 import { IconButton, Button } from '@material-ui/core';
-import {
-  ChevronLeft, ChevronRight, Accessibility, Map,
-} from '@material-ui/icons';
+import { ChevronLeft, ChevronRight, Accessibility, Map } from '@material-ui/icons';
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
@@ -142,20 +140,20 @@ export default class GoogleMapComp extends React.Component {
     console.log(line);
   }
 
-  interpolatepoints(data, fraction) {
-    let newarray = [];
-    let i = 0;
-    for (i = 0; i < data.length - 1; i++) {
-      newarray.push(data[i]);
-      for (let j = 1; j < 10; j++) {
-        let origin = new LatLng(data[i].lat, data[i].lng);
-        let destination = new LatLng(data[i + 1].lat, data[i + 1].lng);
-        let point = interpolate(origin, destination, fraction * j);
-        newarray.push({ lat: point.latitude, lng: point.longitude });
-      }
-    }
-    return newarray;
-  }
+  // interpolatepoints(data, fraction) {
+  //   let newarray = [];
+  //   let i = 0;
+  //   for (i = 0; i < data.length - 1; i++) {
+  //     newarray.push(data[i]);
+  //     for (let j = 1; j < 10; j++) {
+  //       let origin = new LatLng(data[i].lat, data[i].lng);
+  //       let destination = new LatLng(data[i + 1].lat, data[i + 1].lng);
+  //       let point = interpolate(origin, destination, fraction * j);
+  //       newarray.push({ lat: point.latitude, lng: point.longitude });
+  //     }
+  //   }
+  //   return newarray;
+  // }
 
   parseCoord(data) {
     let i = 0;
@@ -165,7 +163,7 @@ export default class GoogleMapComp extends React.Component {
         route.push(data[i].start_location);
       }
       route.push(data[i].end_location);
-      route = this.interpolatepoints(route, 0.1);
+      // route = this.interpolatepoints(route, 0.1);
       for (i = 0; i < route.length - 1; i++) {
         const heading = computeHeading(route[i], route[i + 1]);
         route[i]['heading'] = heading;
@@ -201,26 +199,18 @@ export default class GoogleMapComp extends React.Component {
         )}
 
         {Boolean(fastestRoute.length) && (
-          <Button
-            type="button"
-            style={classes.streetViewButton}
-            onClick={this.toggleStreetView.bind(this)}
-          >
-            {
-              streetView
-                ? (
-                  <div>
-                    <Map />
-                    <span>Map View</span>
-                  </div>
-                )
-                : (
-                  <div>
-                    <Accessibility />
-                    <span>Street View</span>
-                  </div>
-                )
-            }
+          <Button type="button" style={classes.streetViewButton} onClick={this.toggleStreetView.bind(this)}>
+            {streetView ? (
+              <div>
+                <Map />
+                <span>Map View</span>
+              </div>
+            ) : (
+              <div>
+                <Accessibility />
+                <span>Street View</span>
+              </div>
+            )}
           </Button>
         )}
         <GoogleMap
@@ -238,7 +228,7 @@ export default class GoogleMapComp extends React.Component {
             scaleControl: true,
             streetViewControl: false,
             rotateControl: true,
-            fullscreenControl: false
+            fullscreenControl: false,
           }}
         >
           {placeA.lat && <Marker position={placeA} />}
