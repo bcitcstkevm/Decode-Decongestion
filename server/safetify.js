@@ -17,13 +17,13 @@ class Safetify {
     this.arrOfWarnings = arrOfWarnings;
   }
 
-  interpolatepoints(data, fraction = 0.5) {
+  interpolatepoints(data, fraction = 0.2) {
     let newArray = [];
     let i = 0;
     for (i = 0; i < data.length; i++) {
       let newLines = [];
       newLines.push(data[i]);
-      for (let j = 0; j < 2; j++) {
+      for (let j = 0; j < 5; j++) {
         let origin = new sphericalGeo.LatLng(data[i].start_location.lat, data[i].start_location.lng);
         let destination = new sphericalGeo.LatLng(data[i].end_location.lat, data[i].end_location.lng);
         let point = sphericalGeo.interpolate(origin, destination, fraction * (j + 1));

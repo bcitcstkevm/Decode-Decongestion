@@ -6,7 +6,10 @@ import { getMobi } from '../../utils';
 import StreetView from './streetview';
 import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
 import { IconButton, Button } from '@material-ui/core';
-import { ChevronLeft, ChevronRight, Accessibility, Map } from '@material-ui/icons';
+import {
+  ChevronLeft, ChevronRight, Accessibility, Map,
+} from '@material-ui/icons';
+import Minimap from './minimap'
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
@@ -37,6 +40,46 @@ const classes = {
     right: '10px',
     backgroundColor: '#fff',
   },
+  mobiIcon: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    zIndex: 11,
+    // top: 0,
+    borderRadius: 100,
+    width: '20vw',
+    height: '20vw',
+    border: '1px solid black',
+  },
+  desktopMobi: {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    zIndex: 11,
+    // top: 0,
+    borderRadius: 100,
+    width: '100px',
+    height: '100px',
+    border: '1px solid black',
+  },
+  mobiEnable: {
+    opacity: 100,
+  },
+  mobiDisable: {
+    opacity: 50,
+  },
+  overlayDesktop: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    zIndex: 11,
+  },
+  overlayMobile: {
+    backgroundColor: '#fff',
+    position: 'absolute',
+    width: '20vw',
+    height: '20vw',
+    zIndex: 11,
+  },
 };
 
 export default class GoogleMapComp extends React.Component {
@@ -55,7 +98,9 @@ export default class GoogleMapComp extends React.Component {
       current_position: 0,
       center: INITIAL_CENTER,
       streetViewVisibility: false,
+      mobiEnable: true,
       infoBox: null,
+      mq: window.matchMedia( "(max-width: 570px)" ).matches,
     };
     this.mapRef;
   }
@@ -97,10 +142,6 @@ export default class GoogleMapComp extends React.Component {
   toggleStreetView() {
     const { streetView, handleStreetView } = this.props;
     handleStreetView(!streetView);
-    // let newVisibility = !this.state.streetViewVisibility;
-    // this.setState((prevState) => {
-    //   return { ...prevState, streetViewVisibility: newVisibility };
-    // });
   }
 
   componentDidMount() {
@@ -174,17 +215,30 @@ export default class GoogleMapComp extends React.Component {
     }
   }
 
+  handleMobiEnable() {
+    const { mobiEnable } = this.state;
+    this.setState({
+      mobiEnable: !mobiEnable,
+    });
+  };
+
   render() {
-    const { mobiBikes, infoBox, streetViewVisibility, current_position } = this.state;
+    const { mobiBikes, infoBox, current_position, mobiEnable, mq } = this.state;
     const { placeA, placeB, style, fastestRoute, streetView } = this.props;
     return (
       <div style={style}>
+        
         {streetView && (
           <>
+            <div style={mq ? classes.overlayDesktop : classes.overlayMobile}>
+              <p>{fastestRoute[current_position].danger}</p>
+              <p>{fastestRoute[current_position].bikeCollisions}</p>
+              <p>{fastestRoute[current_position].fatalities}</p>
+            </div>
             <IconButton
               style={classes.nextButton}
               onClick={this.nextStreetViewPosition.bind(this)}
-              disabled={current_position >= fastestRoute.length}
+              disabled={current_position >= fastestRoute.length - 1}
             >
               <ChevronRight />
             </IconButton>
@@ -198,19 +252,32 @@ export default class GoogleMapComp extends React.Component {
           </>
         )}
 
+        {!streetView && (
+          <div className={mobiEnable ? classes.mobiEnable : classes.mobiDisable} onClick={this.handleMobiEnable.bind(this)}>
+            <img style={mq ? classes.mobiIcon : classes.desktopMobi} src="https://www.mobibikes.ca/sites/all/themes/smoove_bootstrap/images/icon_guidon_ride.svg" />
+          </div>
+        )}
         {Boolean(fastestRoute.length) && (
-          <Button type="button" style={classes.streetViewButton} onClick={this.toggleStreetView.bind(this)}>
-            {streetView ? (
-              <div>
-                <Map />
-                <span>Map View</span>
-              </div>
-            ) : (
-              <div>
-                <Accessibility />
-                <span>Street View</span>
-              </div>
-            )}
+          <Button
+            type="button"
+            style={classes.streetViewButton}
+            onClick={this.toggleStreetView.bind(this)}
+          >
+            {
+              streetView
+                ? (
+                  <div>
+                    <Map />
+                    <span>Map View</span>
+                  </div>
+                )
+                : (
+                  <div>
+                    <Accessibility />
+                    <span>Simulate Route</span>
+                  </div>
+                )
+            }
           </Button>
         )}
         <GoogleMap
@@ -250,7 +317,7 @@ export default class GoogleMapComp extends React.Component {
                 />
               );
             })}
-          {mobiBikes &&
+          {mobiEnable && mobiBikes &&
             mobiBikes.map((station, i) => {
               const { geopoint } = station;
               if (!geopoint) return;
@@ -258,7 +325,16 @@ export default class GoogleMapComp extends React.Component {
                 lat: geopoint[0],
                 lng: geopoint[1],
               };
-              return <Circle key={i} center={loc} radius={100} />;
+              return (
+                <Circle
+                  key={i}
+                  center={loc}
+                  radius={10}
+                  options={{
+                    strokeColor: 'rgb(0,169,221)',
+                  }}
+                />
+              );
             })}
           {infoBox && (
             <InfoWindow
@@ -280,6 +356,10 @@ export default class GoogleMapComp extends React.Component {
             heading={this.state.streetViewHeading}
           />
         </GoogleMap>
+        {streetView && <Minimap 
+          fastestRoute={fastestRoute}
+          currentPosition={this.state.current_position}
+        />}
       </div>
     );
   }

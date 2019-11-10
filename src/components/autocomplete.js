@@ -1,14 +1,25 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Autocomplete } from '@react-google-maps/api';
-import { TextField, InputAdornment, withStyles } from '@material-ui/core';
 import { Close } from '@material-ui/icons';
 
-const style = {
+const classes = {
+  wholeField: {
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginTop: '5px',
+    marginBottom: '5px',
+    border: '1px solid #000',
+    paddingLeft: '5px',
+    alignItems: 'center',
+    display: 'flex',
+    // width: '200px',
+  },
   textField: {
     borderRadius: 5,
+    border: '0px solid #fff',
     // border: '1px solid #000',
-    width: '200px ',
+    // width: '200px ',
     backgroundColor: '#fff',
   },
   closeButton: {
@@ -16,7 +27,7 @@ const style = {
   },
 };
 
-class AutoCompleteInput extends Component {
+export default class AutoCompleteInput extends Component {
   constructor(props) {
     super(props);
     this.autocomplete = null;
@@ -37,35 +48,33 @@ class AutoCompleteInput extends Component {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
       });
-    } else {
-      console.log('Autocomplete is not loaded yet!');
     }
   }
 
   render() {
-    const { value, handleChange, classes } = this.props;
+    const { value, handleChange, placeholder, clearRoute } = this.props;
     return (
       <Autocomplete
         onLoad={this.onLoad}
         onPlaceChanged={this.onPlaceChanged}
       >
-        <TextField
-          variant="outlined"
-          margin="dense"
-          value={value.name}
-          onChange={(e) => handleChange({ name: e.target.value })}
-          classes={{root: classes.textField}}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                {value.name && <Close
-                  className={classes.closeButton}
-                  onClick={() => handleChange({ name: '' })}
-                />}
-              </InputAdornment>
-            ),
-          }}
-        />
+        <div style={classes.wholeField}>
+          <input
+            style={classes.textField}
+            value={value.name}
+            onChange={(e) => handleChange({ name: e.target.value })}
+            placeholder={placeholder}
+          />
+          {value.name && (
+            <Close
+              className={classes.closeButton}
+              onClick={() => {
+                handleChange({ name: '' });
+                clearRoute();
+              }}
+            />
+          )}
+        </div>
       </Autocomplete>
     );
   }
@@ -76,11 +85,7 @@ AutoCompleteInput.propTypes = {
   value: PropTypes.shape({
     name: PropTypes.string,
   }).isRequired,
+  placeholder: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
-  classes: PropTypes.shape({
-    textField: PropTypes.string,
-    closeButton: PropTypes.string,
-  }).isRequired,
+  clearRoute: PropTypes.func.isRequired,
 };
-
-export default withStyles(style)(AutoCompleteInput);
