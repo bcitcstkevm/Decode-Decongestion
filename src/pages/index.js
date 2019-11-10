@@ -47,14 +47,6 @@ const classes = {
     position: 'absolute',
     bottom: 0,
   },
-  textInput: {
-    borderRadius: 5,
-    border: '1px solid #000',
-    marginBottom: 5,
-    marginTop: 5,
-    paddingLeft: 5,
-    width: '200px ',
-  },
   map: {
     position: 'absolute',
     zIndex: 10,
@@ -91,6 +83,7 @@ export default function Index() {
 
   const [fetchingData, setFetchingData] = useState(false);
   const [fastestRoute, setFastestRoute] = useState([]);
+  const [streetView, setStreetView] = useState(false);
 
   useEffect(() => {
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
@@ -120,29 +113,31 @@ export default function Index() {
         ></script>
       </Head>
       <div style={classes.page}>
-        <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
-          {!toggleMap && (<div style={classes.logo} />)}
-          <AutoCompleteInput
-            value={placeA}
-            handleChange={setPlaceA}
-            style={classes.textInput}
-          />
-          <AutoCompleteInput
-            value={placeB}
-            handleChange={setPlaceB}
-            style={classes.textInput}
-          />
+        {!streetView && (
+          <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
+            {!toggleMap && (<div style={classes.logo} />)}
+            <AutoCompleteInput
+              value={placeA}
+              handleChange={setPlaceA}
+              style={classes.textInput}
+            />
+            <AutoCompleteInput
+              value={placeB}
+              handleChange={setPlaceB}
+              style={classes.textInput}
+            />
 
-          {!toggleMap && (
-            <button
-              type="button"
-              style={classes.button}
-              onClick={() => setToggleMap(!toggleMap)}
-            >
-              Select Location from Map
-            </button>
-          )}
-        </div>
+            {!toggleMap && (
+              <button
+                type="button"
+                style={classes.button}
+                onClick={() => setToggleMap(!toggleMap)}
+              >
+                Select Location from Map
+              </button>
+            )}
+          </div>
+        )}
 
         {toggleMap && (
           <Map
@@ -152,6 +147,8 @@ export default function Index() {
             setPlaceA={setPlaceA}
             setPlaceB={setPlaceB}
             fastestRoute={fastestRoute}
+            streetView={streetView}
+            handleStreetView={setStreetView}
           />
         )}
 
