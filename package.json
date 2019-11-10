@@ -42,5 +42,8 @@
     "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^1.7.0",
     "nodemon": "^1.19.4"
+  },
+  "engines": {
+    "node": "10.x"
   }
 }
