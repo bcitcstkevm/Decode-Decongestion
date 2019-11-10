@@ -47,7 +47,7 @@ class Safetify {
   async setInjurySteps() {
     const { records } = await this.executeFetch('vpd-fatalities-2006-aug-22-2019');
     this.arrOfSteps.forEach((step) => {
-      const distanceFromOrigin = 1; // Distance from origin in km;
+      const distanceFromOrigin = 0.1; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
       const distanceAwayFromCenter = distanceFromOrigin * kmPerDegreeLatitude; //radius
 
@@ -69,7 +69,7 @@ class Safetify {
     const { records } = await this.executeFetch('copy-of-city-of-vancouver');
 
     this.arrOfSteps.forEach((step) => {
-      const distanceFromOrigin = 1; // Distance from origin in km;
+      const distanceFromOrigin = 0.1; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
       const distanceAwayFromCenter = distanceFromOrigin * kmPerDegreeLatitude; //radius
 
