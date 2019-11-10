@@ -45,7 +45,8 @@ class googleDirectionsApi {
     const key = `&key=${API_KEY1}`;
     const mode = `&mode=${this.mode}`;
     const waypoints = this.getWayPoints();
-    return `${API_PATH}${o}${d}${key}${mode}${waypoints}`;
+    const alternatives = `&alternatives=true`
+    return `${API_PATH}${o}${d}${key}${mode}${waypoints}${alternatives}`;
   }
 
   async getListOfDirectionsForEfficient() {
@@ -60,36 +61,69 @@ class googleDirectionsApi {
       throw new Error('line 35 google directions API');
     }
     const { steps, warnings } = this.parseResponseV1(res.data);
-    console.log(steps.length)
     this.safetify.setCVars(steps, warnings);
     const result = await this.safetify.getSafetifiedSteps();
     return result;
   }
+
+  async getListOfDirectionsForSafest() {
+    const path = this.getPath();
+    const options = {
+      method: 'GET',
+      url: path,
+    };
+
+    const res = await axios(options);
+
+    if (res.status != 200 || res.statusText !== 'OK' || res.data.status != 'OK') {
+      throw new Error('line 35 google directions API');
+    }
+
+    const arrayOfSteps = this.parseResponseV1(res.data);
+    const mappedArrayOfSteps = [];
+    for(let i = 0; i < arrayOfSteps.length; i++) {
+      this.safetify.setCVars(arrayOfSteps[i]);
+      const result = await this.safetify.getSafetifiedSteps();
+      mappedArrayOfSteps.push(result);
+    }
+
+    const dangerArray = mappedArrayOfSteps.map((steps) => {
+      let danger = 0;
+
+      steps.forEach(step => {
+        danger += step.danger
+      })
+      return danger;
+    })
+
+    const indexOfSafestRoute = dangerArray.indexOf(Math.max(...dangerArray));
+    return mappedArrayOfSteps[indexOfSafestRoute]
+  }
+
   parseResponseV1(data) {
     const { routes } = data;
-    const firstRoute = routes[0];
-    const { bounds, legs, warnings, waypoint_order } = firstRoute;
-    const firstLeg = legs[0];
-    const { steps } = firstLeg;
-    return { steps, warnings };
+    return routes.map((obj) => obj.legs[0].steps)
+    // const firstRoute = routes[0];
+    // const { bounds, legs, warnings, waypoint_order } = firstRoute;
+    // const firstLeg = legs[0];
+    // const { steps } = firstLeg;
+    // return { steps, warnings };
   }
 }
 
 module.exports = googleDirectionsApi;
 
-(async () => {
-  const origin = {
-    lat: 49.262466,
-    lng: -123.219238,
-  };
+// (async () => {
+//   const origin = {
+//     lat: 49.257762,
+//     lng: -123.168477,
+//   };
 
-  const dest = {
-    lat: 49.237982,
-    lng: -123.06072,
-  };
+//   const dest = {
+//     lat: 49.237756,
+//     lng: -123.139673
+//   };
 
-  const x = new googleDirectionsApi(origin, dest);
-  const res = await x.getListOfDirectionsForEfficient();
-  // console.log(JSON.stringify(res));
-  console.log(res.length)
-})();
+//   const x = new googleDirectionsApi(origin, dest);
+//   const res = await x.getListOfDirectionsForEfficient();
+// })();
