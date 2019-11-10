@@ -5,6 +5,10 @@ import { GoogleMap, Marker, Polyline, Circle, InfoWindow } from '@react-google-m
 import { getMobi } from '../../utils';
 import StreetView from './streetview';
 import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
+import { IconButton, Button } from '@material-ui/core';
+import {
+  ChevronLeft, ChevronRight, Accessibility, Map,
+} from '@material-ui/icons';
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
@@ -13,28 +17,31 @@ const classes = {
     position: 'absolute',
     bottom: '12px',
     zIndex: 20,
-    width: '100px',
+    width: '150px',
     left: '50%',
-    marginLeft: '-50px',
+    marginLeft: '-75px',
     backgroundColor: '#fff',
     border: '1px solid black',
     borderRadius: '10px',
+    display: 'flex',
   },
   previousButton: {
     position: 'absolute',
     zIndex: 20,
     top: '50%',
-    left: '0px',
+    left: '10px',
+    backgroundColor: '#fff',
   },
   nextButton: {
     position: 'absolute',
     zIndex: 20,
     top: '50%',
-    right: '0px',
+    right: '10px',
+    backgroundColor: '#fff',
   },
 };
 
-export default class Map extends React.Component {
+export default class GoogleMapComp extends React.Component {
   constructor(props) {
     super(props);
 
@@ -90,10 +97,12 @@ export default class Map extends React.Component {
   }
 
   toggleStreetView() {
-    let newVisibility = !this.state.streetViewVisibility;
-    this.setState((prevState) => {
-      return { ...prevState, streetViewVisibility: newVisibility };
-    });
+    const { streetView, handleStreetView } = this.props;
+    handleStreetView(!streetView);
+    // let newVisibility = !this.state.streetViewVisibility;
+    // this.setState((prevState) => {
+    //   return { ...prevState, streetViewVisibility: newVisibility };
+    // });
   }
 
   componentDidMount() {
@@ -168,25 +177,51 @@ export default class Map extends React.Component {
   }
 
   render() {
-    const { mobiBikes, infoBox, streetViewVisibility } = this.state;
-    const { placeA, placeB, style, fastestRoute } = this.props;
+    const { mobiBikes, infoBox, streetViewVisibility, current_position } = this.state;
+    const { placeA, placeB, style, fastestRoute, streetView } = this.props;
     return (
       <div style={style}>
-        {streetViewVisibility && (
+        {streetView && (
           <>
-            <button style={classes.nextButton} onClick={this.nextStreetViewPosition.bind(this)}>
-              Next
-            </button>
-            <button style={classes.previousButton} onClick={this.prevStreetViewPosition.bind(this)}>
-              Prev
-            </button>
+            <IconButton
+              style={classes.nextButton}
+              onClick={this.nextStreetViewPosition.bind(this)}
+              disabled={current_position >= fastestRoute.length}
+            >
+              <ChevronRight />
+            </IconButton>
+            <IconButton
+              style={classes.previousButton}
+              onClick={this.prevStreetViewPosition.bind(this)}
+              disabled={current_position <= 0}
+            >
+              <ChevronLeft />
+            </IconButton>
           </>
         )}
 
         {Boolean(fastestRoute.length) && (
-          <button type="button" style={classes.streetViewButton} onClick={this.toggleStreetView.bind(this)}>
-            Street View
-          </button>
+          <Button
+            type="button"
+            style={classes.streetViewButton}
+            onClick={this.toggleStreetView.bind(this)}
+          >
+            {
+              streetView
+                ? (
+                  <div>
+                    <Map />
+                    <span>Map View</span>
+                  </div>
+                )
+                : (
+                  <div>
+                    <Accessibility />
+                    <span>Street View</span>
+                  </div>
+                )
+            }
+          </Button>
         )}
         <GoogleMap
           id="map"
@@ -243,7 +278,8 @@ export default class Map extends React.Component {
           <StreetView
             currentPosition={this.state.current_position}
             positions={this.state.positions}
-            visbility={this.state.streetViewVisibility}
+            visbility={streetView}
+            heading={this.state.streetViewHeading}
           />
         </GoogleMap>
       </div>
