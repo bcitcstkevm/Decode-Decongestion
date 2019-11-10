@@ -48,10 +48,11 @@ app
       return handle(req, res);
     });
 
+    const PORT = process.env.PORT || 3000
 
-    server.listen(process.env.PORT, (err) => {
+    server.listen(PORT, (err) => {
       if (err) throw err;
-      console.log('> Ready on http://localhost:3000');
+      console.log('> Ready on http://localhost:',PORT);
     });
   })
   .catch((ex) => {
