@@ -18,9 +18,9 @@ const classes = {
     position: 'absolute',
     bottom: '12px',
     zIndex: 20,
-    width: '150px',
+    width: '200px',
     left: '50%',
-    marginLeft: '-75px',
+    marginLeft: '-100px',
     backgroundColor: '#fff',
     border: '1px solid black',
     borderRadius: '10px',
@@ -67,18 +67,19 @@ const classes = {
     opacity: 50,
   },
   overlayDesktop: {
-    backgroundColor: '#fff',
     position: 'absolute',
-    width: 100,
-    height: 100,
+    width: '200px',
+    height: '200px',
     zIndex: 11,
+    left: '50%',
+    marginLeft: '-100px',
   },
   overlayMobile: {
-    backgroundColor: '#fff',
     position: 'absolute',
     width: '20vw',
-    height: '20vw',
     zIndex: 11,
+    left: '50%',
+    marginLeft: '-20vw',
   },
 };
 
@@ -230,10 +231,38 @@ export default class GoogleMapComp extends React.Component {
         
         {streetView && (
           <>
-            <div style={mq ? classes.overlayDesktop : classes.overlayMobile}>
-              <p>{fastestRoute[current_position].danger}</p>
-              <p>{fastestRoute[current_position].bikeCollisions}</p>
-              <p>{fastestRoute[current_position].fatalities}</p>
+            <div
+              style={mq ? {
+                backgroundColor: `rgb(${255 * fastestRoute[current_position].danger},${255 * (1 - fastestRoute[current_position].danger)},0)`,
+                position: 'absolute',
+                width: '40vw',
+                zIndex: 11,
+                left: '50%',
+                marginLeft: '-30vw',
+                borderRadius: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '10px',
+              } : {
+                backgroundColor: `rgb(${255 * fastestRoute[current_position].danger},${255 * (1 - fastestRoute[current_position].danger)},0)`,
+                position: 'absolute',
+                width: '200px',
+                height: '100px',
+                zIndex: 11,
+                left: '50%',
+                marginLeft: '-100px',
+                borderRadius: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '10px',
+              }}
+            >
+              <p>Danger Level: {fastestRoute[current_position].danger < 0.33 ? 'Low' : (fastestRoute[current_position].danger < 0.66 ? 'Medium' : 'High')}</p>
+              <p>Collision #: {fastestRoute[current_position].bikeCollisions}</p>
             </div>
             <IconButton
               style={classes.nextButton}

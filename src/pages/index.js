@@ -29,6 +29,9 @@ const classes = {
     // backgroundColor: 'black',
     width: '200px',
     height: '200px',
+    fontSize: '2rem',
+    marginBottom: '3rem',
+    textAlign: 'center',
   },
   inputs: {
     zIndex: 13,
@@ -138,7 +141,8 @@ export default function Index() {
           <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
             {!toggleMap && (
               <div style={classes.logo}>
-                <DirectionsBike style={{ width: 200, height: 200, }} />
+                <DirectionsBike style={{ width: 200, height: 200 }} />
+                <p>Bike ToGo</p>
               </div>
             )}
 
