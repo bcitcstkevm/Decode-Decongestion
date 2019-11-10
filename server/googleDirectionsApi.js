@@ -60,6 +60,7 @@ class googleDirectionsApi {
       throw new Error('line 35 google directions API');
     }
     const { steps, warnings } = this.parseResponseV1(res.data);
+    console.log(steps.length)
     this.safetify.setCVars(steps, warnings);
     const result = await this.safetify.getSafetifiedSteps();
     return result;
@@ -76,18 +77,19 @@ class googleDirectionsApi {
 
 module.exports = googleDirectionsApi;
 
-// (async () => {
-//   const origin = {
-//     lat: 49.262466,
-//     lng: -123.219238,
-//   };
+(async () => {
+  const origin = {
+    lat: 49.262466,
+    lng: -123.219238,
+  };
 
-//   const dest = {
-//     lat: 49.237982,
-//     lng: -123.06072,
-//   };
+  const dest = {
+    lat: 49.237982,
+    lng: -123.06072,
+  };
 
-//   const x = new googleDirectionsApi(origin, dest);
-//   const res = await x.getListOfDirectionsForEfficient();
-//   console.log(JSON.stringify(res));
-// })();
+  const x = new googleDirectionsApi(origin, dest);
+  const res = await x.getListOfDirectionsForEfficient();
+  // console.log(JSON.stringify(res));
+  console.log(res.length)
+})();
