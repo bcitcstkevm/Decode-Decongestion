@@ -1,9 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Autocomplete } from '@react-google-maps/api';
+import { TextField, InputAdornment, withStyles } from '@material-ui/core';
 import { Close } from '@material-ui/icons';
 
-export default class AutoCompleteInput extends Component {
+const style = {
+  textField: {
+    borderRadius: 5,
+    // border: '1px solid #000',
+    width: '200px ',
+    backgroundColor: '#fff',
+  },
+  closeButton: {
+    cursor: 'pointer',
+  },
+};
+
+class AutoCompleteInput extends Component {
   constructor(props) {
     super(props);
     this.autocomplete = null;
@@ -30,16 +43,28 @@ export default class AutoCompleteInput extends Component {
   }
 
   render() {
-    const { value, handleChange, style } = this.props;
+    const { value, handleChange, classes } = this.props;
     return (
       <Autocomplete
         onLoad={this.onLoad}
         onPlaceChanged={this.onPlaceChanged}
       >
-        <input
+        <TextField
+          variant="outlined"
+          margin="dense"
           value={value.name}
           onChange={(e) => handleChange({ name: e.target.value })}
-          style={style}
+          classes={{root: classes.textField}}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                {value.name && <Close
+                  className={classes.closeButton}
+                  onClick={() => handleChange({ name: '' })}
+                />}
+              </InputAdornment>
+            ),
+          }}
         />
       </Autocomplete>
     );
@@ -52,5 +77,10 @@ AutoCompleteInput.propTypes = {
     name: PropTypes.string,
   }).isRequired,
   handleChange: PropTypes.func.isRequired,
-  style: PropTypes.shape({}).isRequired,
+  classes: PropTypes.shape({
+    textField: PropTypes.string,
+    closeButton: PropTypes.string,
+  }).isRequired,
 };
+
+export default withStyles(style)(AutoCompleteInput);
