@@ -8,6 +8,7 @@ function StreetView(props) {
       position={props.positions[props.currentPosition]}
       visible={props.visbility}
       motionTracking={true}
+      options={{ clickToGo: false, disableDefaultUI: true }}
     />
   );
 }

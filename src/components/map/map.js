@@ -49,38 +49,35 @@ export default class Map extends React.Component {
       current_position: 0,
       center: INITIAL_CENTER,
       streetViewVisibility: false,
-      streetViewHeading: 0,
-      infoBox: null
+      infoBox: null,
     };
     this.mapRef;
   }
 
-  componentDidMount() {
-    const initialHeading = computeHeading(this.state.positions[0], this.state.positions[1]);
-    console.log('initialHeading', initialHeading);
-    this.setState((prevState) => {
-      return { ...prevState, streetViewHeading: initialHeading };
-    });
+  componentDidUpdate(prevProps) {
+    if (
+      this.props.fastestRoute &&
+      prevProps &&
+      JSON.stringify(prevProps.fastestRoute) !== JSON.stringify(this.props.fastestRoute)
+    ) {
+      this.parseCoord(this.props.fastestRoute);
+    }
   }
 
   nextStreetViewPosition() {
     console.log('state', this.state);
 
     const newPosition =
-      this.state.current_position + 1 > this.state.positions.length
-        ? this.state.positions.length
+      this.state.current_position + 1 > this.state.positions.length - 1
+        ? this.state.positions.length - 1
         : this.state.current_position + 1;
 
-    let newHeading =
-      newPosition === this.state.current_position
-        ? this.state.streetViewHeading
-        : computeHeading(this.state.positions[this.state.current_position], this.state.positions[newPosition]);
-
-    console.log('newHeading', newHeading);
     this.setState((prevState) => {
-      return { ...prevState, current_position: newPosition, streetViewHeading: newHeading };
+      return {
+        ...prevState,
+        current_position: newPosition,
+      };
     });
-    console.log('newHeading state', this.state);
   }
 
   prevStreetViewPosition() {
@@ -110,9 +107,9 @@ export default class Map extends React.Component {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
     const { placeA, placeB } = this.props;
-    this.setState({infoBox: null})
+    this.setState({ infoBox: null });
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
-      return
+      return;
     }
 
     if (Object.keys(placeA).length !== 3) {
@@ -129,40 +126,51 @@ export default class Map extends React.Component {
       infoBox: {
         lat,
         lng,
-        line
+        line,
+      },
+    });
+    console.log(line);
+  }
+
+  parseCoord(data) {
+    let i;
+    let route = [];
+    if (data && data.length > 0) {
+      for (i = 0; i < data.length - 1; i++) {
+        route.push(data[i].start_location);
       }
-    })
-    console.log(line)
+      route.push(data[i].end_location);
+
+      for (i = 0; i < route.length - 1; i++) {
+        const heading = computeHeading(route[i], route[i + 1]);
+        route[i]['heading'] = heading;
+      }
+      route[i]['heading'] = route[i - 1]['heading'];
+      this.setState({ positions: route });
+      console.log('route: ', route);
+    }
   }
 
   render() {
     const { mobiBikes, infoBox, streetViewVisibility } = this.state;
     const { placeA, placeB, style, fastestRoute } = this.props;
+    // console.log('fastestRoute', fastestRoute);
+    // this.parseCoord(fastestRoute);
     return (
       <div style={style}>
         {streetViewVisibility && (
           <>
-            <button
-              style={classes.nextButton}
-              onClick={this.nextStreetViewPosition.bind(this)}
-            >
+            <button style={classes.nextButton} onClick={this.nextStreetViewPosition.bind(this)}>
               Next
             </button>
-            <button
-              style={classes.previousButton}
-              onClick={this.prevStreetViewPosition.bind(this)}
-            >
+            <button style={classes.previousButton} onClick={this.prevStreetViewPosition.bind(this)}>
               Prev
             </button>
           </>
         )}
 
         {Boolean(fastestRoute.length) && (
-          <button
-            type="button"
-            style={classes.streetViewButton}
-            onClick={this.toggleStreetView.bind(this)}
-          >
+          <button type="button" style={classes.streetViewButton} onClick={this.toggleStreetView.bind(this)}>
             Street View
           </button>
         )}
@@ -188,9 +196,9 @@ export default class Map extends React.Component {
                     { lat: start_location.lat, lng: start_location.lng },
                     { lat: end_location.lat, lng: end_location.lng },
                   ]}
-                  onClick={e => this.handleLineClick(e, line)}
+                  onClick={(e) => this.handleLineClick(e, line)}
                   options={{
-                    strokeColor: `rgb(${255 * line.danger}, ${255*(1-line.danger)}, 0)`,
+                    strokeColor: `rgb(${255 * line.danger}, ${255 * (1 - line.danger)}, 0)`,
                   }}
                 />
               );
@@ -204,23 +212,24 @@ export default class Map extends React.Component {
                 lng: geopoint[1],
               };
               return <Circle key={i} center={loc} radius={100} />;
-          })}
-          {infoBox && <InfoWindow
-            position={{lat: infoBox.lat, lng: infoBox.lng}}
-            onCloseClick={() => this.setState({infoBox: null})}
-          >
-            <div style={{ backgroundColor: 'yellow', opacity: 0.75, padding: 12 }}>
-              <div style={{ fontSize: 16, fontColor: `#08233B` }}>
-                <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
-                <span>Fatalities: {infoBox.line.fatalities}</span>
+            })}
+          {infoBox && (
+            <InfoWindow
+              position={{ lat: infoBox.lat, lng: infoBox.lng }}
+              onCloseClick={() => this.setState({ infoBox: null })}
+            >
+              <div style={{ backgroundColor: 'yellow', opacity: 0.75, padding: 12 }}>
+                <div style={{ fontSize: 16, fontColor: `#08233B` }}>
+                  <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
+                  <span>Fatalities: {infoBox.line.fatalities}</span>
+                </div>
               </div>
-            </div>
-          </InfoWindow>}
+            </InfoWindow>
+          )}
           <StreetView
             currentPosition={this.state.current_position}
             positions={this.state.positions}
             visbility={this.state.streetViewVisibility}
-            heading={this.state.streetViewHeading}
           />
         </GoogleMap>
       </div>
