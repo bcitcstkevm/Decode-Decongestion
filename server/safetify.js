@@ -20,22 +20,20 @@ class Safetify {
   interpolatepoints(data, fraction = 0.5) {
     let newArray = [];
     let i = 0;
-    debugger
-    for (i = 0; i < data.length - 1; i++) {
-      debugger
-      let newLines = []
-      newLines.push(data[i])
-      for (let j = 0; j < 1; j++) {
+    for (i = 0; i < data.length; i++) {
+      let newLines = [];
+      newLines.push(data[i]);
+      for (let j = 0; j < 2; j++) {
         let origin = new sphericalGeo.LatLng(data[i].start_location.lat, data[i].start_location.lng);
-        let destination = new sphericalGeo.LatLng(data[i + 1].end_location.lat, data[i + 1].end_location.lng);
+        let destination = new sphericalGeo.LatLng(data[i].end_location.lat, data[i].end_location.lng);
         let point = sphericalGeo.interpolate(origin, destination, fraction * (j + 1));
         let newLine = {};
-        
-        newLine['start_location'] = newLines[j].end_location;
-        newLine['end_location'] = {lat: point.latitude, lng: point.longitude};
+
+        newLine['start_location'] = j === 0 ? newLines[j].start_location : newLines[j].end_location;
+        newLine['end_location'] = { lat: point.latitude, lng: point.longitude };
         newLines.push(newLine);
       }
-
+      newLines.shift();
       newArray.push(...newLines);
     }
     return newArray;
@@ -86,7 +84,7 @@ class Safetify {
           if (pointWithinCircle([record.fields.long, record.fields.lat], srtlch, distanceAwayFromCenter)) {
             step.fatalities += 1;
           }
-        } catch (err){}
+        } catch (err) {}
       });
     });
   }
@@ -95,7 +93,7 @@ class Safetify {
     const { records } = await this.executeFetch('copy-of-city-of-vancouver');
 
     this.arrOfSteps.forEach((step) => {
-      const distanceFromOrigin = 0.2;// Distance from origin in km;
+      const distanceFromOrigin = 0.2; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
       const distanceAwayFromCenter = distanceFromOrigin * kmPerDegreeLatitude; //radius
 
@@ -127,19 +125,18 @@ class Safetify {
   normalize() {
     let max = 0;
     this.arrOfSteps.forEach((step) => {
-      if(step.danger && step.danger > max) {
+      if (step.danger && step.danger > max) {
         max = step.danger;
       }
-    })
+    });
 
     this.arrOfSteps.forEach((step) => {
-      if(step.danger) {
+      if (step.danger) {
         step.danger = step.danger / max;
       }
-    })
-  } 
+    });
+  }
 }
-
 
 const pointWithinCircle = (point, center, radius) => {
   const dy = Math.pow(Math.abs(point[1] - center.lat), 2);
