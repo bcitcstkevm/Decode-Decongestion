@@ -178,7 +178,7 @@ export default class GoogleMapComp extends React.Component {
   toggleStreetView() {
     const { streetView, handleStreetView } = this.props;
     if (streetView) {
-      this.setState({ isAutoplay: false })
+      this.setState({ isAutoplay: false, current_position: 0 })
     }
     handleStreetView(!streetView);
   }
