@@ -71,7 +71,7 @@ class Safetify {
   async setInjurySteps() {
     const { records } = await this.executeFetch('vpd-fatalities-2006-aug-22-2019');
     this.arrOfSteps.forEach((step) => {
-      const distanceFromOrigin = 0.2; // Distance from origin in km;
+      const distanceFromOrigin = 0.3; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
       const distanceAwayFromCenter = distanceFromOrigin * kmPerDegreeLatitude; //radius
 
@@ -93,7 +93,7 @@ class Safetify {
     const { records } = await this.executeFetch('copy-of-city-of-vancouver');
 
     this.arrOfSteps.forEach((step) => {
-      const distanceFromOrigin = 0.2; // Distance from origin in km;
+      const distanceFromOrigin = 0.3; // Distance from origin in km;
       const kmPerDegreeLatitude = 1 / 111;
       const distanceAwayFromCenter = distanceFromOrigin * kmPerDegreeLatitude; //radius
 
@@ -109,6 +109,9 @@ class Safetify {
   }
 
   aggregateDangers() {
+    const collisionWeight = (1/7);
+    const deathWeight = (6/7);
+
     this.arrOfSteps.forEach((step) => {
       try {
         if (!step.bikeCollisions) {
@@ -117,7 +120,7 @@ class Safetify {
         if (!step.fatalities) {
           step.fatalities = 0;
         }
-        step.danger = step.bikeCollisions + step.fatalities;
+        step.danger = (step.bikeCollisions * collisionWeight) + (step.fatalities * deathWeight);
       } catch (err) {}
     });
   }
