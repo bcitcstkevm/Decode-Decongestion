@@ -232,6 +232,14 @@ export default class GoogleMapComp extends React.Component {
           onLoad={(ref) => {
             this.mapRef = ref;
           }}
+          options={{
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: true,
+            streetViewControl: false,
+            rotateControl: true,
+            fullscreenControl: false
+          }}
         >
           {placeA.lat && <Marker position={placeA} />}
           {placeB.lat && <Marker position={placeB} />}
