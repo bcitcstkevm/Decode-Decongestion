@@ -78,23 +78,16 @@ module.exports = googleDirectionsApi;
 
 // (async () => {
 //   const origin = {
-//     name: undefined,
-//     lat: 49.275802,
-//     lng: -122.94506,
+//     lat: 49.262466,
+//     lng: -123.219238,
 //   };
 
 //   const dest = {
-//     name: 'UBC',
-//     lat: 49.260026,
-//     lng: -123.245942,
+//     lat: 49.237982,
+//     lng: -123.06072,
 //   };
 
-//   const x = new googleDirectionsApi(origin, dest, 'bicycling', [
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//     ['49.259564', '-123.070240'],
-//   ]);
+//   const x = new googleDirectionsApi(origin, dest);
 //   const res = await x.getListOfDirectionsForEfficient();
 //   console.log(JSON.stringify(res));
 // })();
