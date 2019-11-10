@@ -60,7 +60,7 @@ class Safetify {
           if (pointWithinCircle([record.fields.long, record.fields.lat], srtlch, distanceAwayFromCenter)) {
             step.fatalities += 1;
           }
-        } catch {}
+        } catch (err){}
       });
     });
   }
@@ -94,7 +94,7 @@ class Safetify {
           step.fatalities = 0;
         }
         step.danger = step.bikeCollisions + step.fatalities;
-      } catch {}
+      } catch (err) {}
     });
   }
 

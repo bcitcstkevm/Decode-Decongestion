@@ -1,9 +1,10 @@
+/* eslint-disable */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { GoogleMap, Marker, Polyline, Circle, InfoWindow } from '@react-google-maps/api';
 import { getMobi } from '../../utils';
 import StreetView from './streetview';
-import { computeHeading } from 'spherical-geometry-js';
+import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
 import { IconButton, Button } from '@material-ui/core';
 import {
   ChevronLeft, ChevronRight, Accessibility, Map,
@@ -47,11 +48,11 @@ export default class GoogleMapComp extends React.Component {
     this.state = {
       mobiBikes: [],
       positions: [
-        { lat: 49.225769, lng: -123.077244 },
-        { lat: 49.226604, lng: -123.077339 },
-        { lat: 49.227502, lng: -123.077307 },
-        { lat: 49.2276733, lng: -123.0769295 },
-        { lat: 49.2276835, lng: -123.0765166 },
+        { lat: 49.225769, lng: -123.077244, heading: 0 },
+        { lat: 49.226604, lng: -123.077339, heading: 0 },
+        { lat: 49.227502, lng: -123.077307, heading: 0 },
+        { lat: 49.2276733, lng: -123.0769295, heading: 0 },
+        { lat: 49.2276835, lng: -123.0765166, heading: 0 },
       ],
       current_position: 0,
       center: INITIAL_CENTER,
@@ -141,15 +142,30 @@ export default class GoogleMapComp extends React.Component {
     console.log(line);
   }
 
+  interpolatepoints(data, fraction) {
+    let newarray = [];
+    let i = 0;
+    for (i = 0; i < data.length - 1; i++) {
+      newarray.push(data[i]);
+      for (let j = 1; j < 10; j++) {
+        let origin = new LatLng(data[i].lat, data[i].lng);
+        let destination = new LatLng(data[i + 1].lat, data[i + 1].lng);
+        let point = interpolate(origin, destination, fraction * j);
+        newarray.push({ lat: point.latitude, lng: point.longitude });
+      }
+    }
+    return newarray;
+  }
+
   parseCoord(data) {
-    let i;
+    let i = 0;
     let route = [];
-    if (data && data.length > 0) {
+    if (data && data.length > 1) {
       for (i = 0; i < data.length - 1; i++) {
         route.push(data[i].start_location);
       }
       route.push(data[i].end_location);
-
+      route = this.interpolatepoints(route, 0.1);
       for (i = 0; i < route.length - 1; i++) {
         const heading = computeHeading(route[i], route[i + 1]);
         route[i]['heading'] = heading;
@@ -163,8 +179,6 @@ export default class GoogleMapComp extends React.Component {
   render() {
     const { mobiBikes, infoBox, streetViewVisibility, current_position } = this.state;
     const { placeA, placeB, style, fastestRoute, streetView } = this.props;
-    // console.log('fastestRoute', fastestRoute);
-    // this.parseCoord(fastestRoute);
     return (
       <div style={style}>
         {streetView && (
@@ -217,6 +231,14 @@ export default class GoogleMapComp extends React.Component {
           onClick={this.handleClick.bind(this)}
           onLoad={(ref) => {
             this.mapRef = ref;
+          }}
+          options={{
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: true,
+            streetViewControl: false,
+            rotateControl: true,
+            fullscreenControl: false
           }}
         >
           {placeA.lat && <Marker position={placeA} />}
