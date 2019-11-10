@@ -1,7 +1,6 @@
 /* eslint-disable */
 
-const API_KEY1 = 'AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA';
-const API_KEY2 = 'AIzaSyBc2eqMjOT4ph-QZrxPTG3AqS-pWMUBzDc';
+const API_KEY1 = process.env.GOOGLE_API;
 const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
 const axios = require('axios');
 const safe = require('./safetify');
@@ -45,7 +44,7 @@ class googleDirectionsApi {
     const key = `&key=${API_KEY1}`;
     const mode = `&mode=${this.mode}`;
     const waypoints = this.getWayPoints();
-    const alternatives = `&alternatives=true`
+    const alternatives = `&alternatives=true`;
     return `${API_PATH}${o}${d}${key}${mode}${waypoints}${alternatives}`;
   }
 
@@ -60,11 +59,11 @@ class googleDirectionsApi {
     if (res.status != 200 || res.statusText !== 'OK' || res.data.status != 'OK') {
       throw new Error('line 35 google directions API');
     }
-    
+
     const steps = this.parseResponseV1(res.data);
     this.safetify.setCVars(steps[0]);
     const result = await this.safetify.getSafetifiedSteps();
-    return {length: steps.length, result: result}
+    return { length: steps.length, result: result };
   }
 
   async getListOfDirectionsForSafest() {
@@ -82,7 +81,7 @@ class googleDirectionsApi {
 
     const arrayOfSteps = this.parseResponseV1(res.data);
     const mappedArrayOfSteps = [];
-    for(let i = 0; i < arrayOfSteps.length; i++) {
+    for (let i = 0; i < arrayOfSteps.length; i++) {
       this.safetify.setCVars(arrayOfSteps[i]);
       const result = await this.safetify.getSafetifiedSteps();
       mappedArrayOfSteps.push(result);
@@ -91,19 +90,19 @@ class googleDirectionsApi {
     const dangerArray = mappedArrayOfSteps.map((steps) => {
       let danger = 0;
 
-      steps.forEach(step => {
-        danger += step.danger
-      })
+      steps.forEach((step) => {
+        danger += step.danger;
+      });
       return danger;
-    })
+    });
 
     const indexOfSafestRoute = dangerArray.indexOf(Math.max(...dangerArray));
-    return mappedArrayOfSteps[indexOfSafestRoute]
+    return mappedArrayOfSteps[indexOfSafestRoute];
   }
 
   parseResponseV1(data) {
     const { routes } = data;
-    return routes.map((obj) => obj.legs[0].steps)
+    return routes.map((obj) => obj.legs[0].steps);
     // const firstRoute = routes[0];
     // const { bounds, legs, warnings, waypoint_order } = firstRoute;
     // const firstLeg = legs[0];
