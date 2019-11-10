@@ -9,6 +9,7 @@ import { IconButton, Button } from '@material-ui/core';
 import {
   ChevronLeft, ChevronRight, Accessibility, Map,
 } from '@material-ui/icons';
+import Minimap from './minimap'
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
@@ -290,6 +291,10 @@ export default class GoogleMapComp extends React.Component {
             heading={this.state.streetViewHeading}
           />
         </GoogleMap>
+        {streetView && <Minimap 
+          fastestRoute={fastestRoute}
+          currentPosition={this.state.current_position}
+        />}
       </div>
     );
   }
