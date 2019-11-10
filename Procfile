@@ -1,1 +1,1 @@
-web: npm run buildstart
+web: npm run dev
