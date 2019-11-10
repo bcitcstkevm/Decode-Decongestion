@@ -5,7 +5,7 @@ import { DirectionsBike, Map } from '@material-ui/icons';
 
 import AutoCompleteInput from '../components/autocomplete';
 import MapComp from '../components/map/map';
-import { getEfficientPath } from '../utils';
+import { getEfficientPath, getSafest } from '../utils';
 
 const classes = {
   root: {
@@ -115,10 +115,22 @@ export default function Index() {
   const [placeB, setPlaceB] = useState({ name: '' });
   const [toggleMap, setToggleMap] = useState(false);
   const [checkedSafest, setCheckedSafest] = useState(false);
+  const [safestMessage, setSafestMessage] = useState(false);
 
   const [fetchingData, setFetchingData] = useState(false);
   const [fastestRoute, setFastestRoute] = useState([]);
   const [streetView, setStreetView] = useState(false);
+
+  const checkSafestRoute = () => {
+    if (!checkedSafest) {
+      setFetchingData(true)
+      getSafest(placeA, placeB, result => {
+        setFetchingData(false);
+        setFastestRoute(result);
+      })
+    }
+    setCheckedSafest(!checkedSafest);
+  };
 
   useEffect(() => {
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
@@ -126,7 +138,12 @@ export default function Index() {
       setFetchingData(true)
       getEfficientPath(placeA, placeB, result => {
         setFetchingData(false)
-        setFastestRoute(result)
+        setFastestRoute(result.result)
+        if (result.length === 1) {
+          setSafestMessage(true);
+          setCheckedSafest(true);
+
+        }
       })
     }
   }, [placeA, placeB]);
@@ -183,7 +200,7 @@ export default function Index() {
                   control={(
                     <Checkbox
                       checked={checkedSafest}
-                      onChange={() => setCheckedSafest(!checkedSafest)}
+                      onChange={checkSafestRoute}
                       value={checkedSafest}
                       color="primary"
                     />
@@ -224,6 +241,13 @@ export default function Index() {
             <div style={classes.modalContent}>
               <p>Calculating...</p>
               <CircularProgress />
+            </div>
+          </div>
+        )}
+        {safestMessage && (
+          <div aria-hidden="true" style={classes.modal} onClick={() => setSafestMessage(false)}>
+            <div style={classes.modalContent}>
+              <p>This is the safest route!</p>
             </div>
           </div>
         )}

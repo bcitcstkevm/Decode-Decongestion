@@ -39,7 +39,7 @@ app
       gdaobj.setCVars(origin, dest);
       // mode and waypoints are optional
       //result is an array of objects. each object is a step
-      gdaobj.getListOfDirectionsForSafest().then(result => {
+      gdaobj.getListOfDirectionsForEfficient().then(result => {
         res.send(result)
       })
     });
@@ -60,7 +60,7 @@ app
       gdaobj.setCVars(origin, dest);
       // mode and waypoints are optional
       //result is an array of objects. each object is a step
-      gdaobj.getListOfDirectionsForEfficient().then(result => {
+      gdaobj.getListOfDirectionsForSafest().then(result => {
         res.send(result)
       })
     });
