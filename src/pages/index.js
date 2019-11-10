@@ -134,6 +134,7 @@ export default function Index() {
 
   useEffect(() => {
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
+      setSafestMessage(false);
       setToggleMap(true)
       setFetchingData(true)
       getEfficientPath(placeA, placeB, result => {
