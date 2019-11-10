@@ -60,10 +60,11 @@ class googleDirectionsApi {
     if (res.status != 200 || res.statusText !== 'OK' || res.data.status != 'OK') {
       throw new Error('line 35 google directions API');
     }
-    const { steps, warnings } = this.parseResponseV1(res.data);
-    this.safetify.setCVars(steps, warnings);
+    
+    const steps = this.parseResponseV1(res.data);
+    this.safetify.setCVars(steps[0]);
     const result = await this.safetify.getSafetifiedSteps();
-    return result;
+    return {length: steps.length, result: result}
   }
 
   async getListOfDirectionsForSafest() {
