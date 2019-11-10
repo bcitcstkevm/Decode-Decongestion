@@ -39,10 +39,33 @@ app
       gdaobj.setCVars(origin, dest);
       // mode and waypoints are optional
       //result is an array of objects. each object is a step
+      gdaobj.getListOfDirectionsForSafest().then(result => {
+        res.send(result)
+      })
+    });
+
+    server.get('/safest', (req, res) => {
+      const origin = {
+        name: req.query.pointAName,
+        lat: req.query.pointALat,
+        lng: req.query.pointALng,
+      };
+
+      const dest = {
+        name: req.query.pointBName,
+        lat: req.query.pointBLat,
+        lng: req.query.pointBLng,
+      };
+
+      gdaobj.setCVars(origin, dest);
+      // mode and waypoints are optional
+      //result is an array of objects. each object is a step
       gdaobj.getListOfDirectionsForEfficient().then(result => {
         res.send(result)
       })
     });
+
+  
 
     server.get('*', (req, res) => {
       return handle(req, res);

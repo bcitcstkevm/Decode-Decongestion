@@ -12,7 +12,7 @@ class Safetify {
     this.arrOfWarnings = arrOfWarnings;
   }
 
-  setCVars(arrOfSteps, arrOfWarnings) {
+  setCVars(arrOfSteps, arrOfWarnings = null) {
     this.arrOfSteps = arrOfSteps;
     this.arrOfWarnings = arrOfWarnings;
   }
@@ -153,5 +153,4 @@ module.exports = Safetify;
 (async () => {
   const x = new Safetify(testdata);
   const res = await x.getSafetifiedSteps();
-  console.log(res);
 })();
