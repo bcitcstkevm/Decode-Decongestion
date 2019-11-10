@@ -23,7 +23,7 @@ export default class Minimap extends React.Component {
         id="minimap"
         mapContainerStyle={{width: '100%', height: '100%'}}
         center={position ? position.start_location : null}
-        zoom={12}
+        zoom={15}
         onLoad={(ref) => {
           this.mapRef = ref;
         }}

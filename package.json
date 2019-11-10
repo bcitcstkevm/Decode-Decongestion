@@ -7,7 +7,7 @@
     "dev": "nodemon --watch server server/index.js",
     "build": "next build",
     "start": "next start",
-    "kevin": "node ./server/googleDirectionsApi.js",
+    "kevin": "node --inspect ./server/googleDirectionsApi.js",
     "kev2": "node ./server/safetify.js"
   },
   "repository": {
