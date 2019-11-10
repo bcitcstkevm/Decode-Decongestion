@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { Button } from '@material-ui/core';
+import { CircularProgress } from '@material-ui/core';
 
 import AutoCompleteInput from '../components/autocomplete';
 import Map from '../components/map/map';
 import { getEfficientPath } from '../utils';
 
 const classes = {
+  root: {
+    height: '100vh',
+    maxHeight: '100vh',
+    width: '100vw',
+  },
   page: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    verticalAlign: 'middle',
+    justifyContent: 'center',
+    // margin: '30%',
+    // maxHeight: '100%',
+    height: '100%',
+    // transition: 'flex-start 1000ms linear',
   },
   logo: {
     backgroundColor: 'black',
@@ -19,6 +30,30 @@ const classes = {
   },
   inputs: {
     zIndex: 13,
+    position: 'absolute',
+    top: '30%',
+  },
+  inputsMoved: {
+    zIndex: 13,
+    position: 'absolute',
+    top: 0,
+    left: 'calc(50%-200px)',
+    transition: 'top .3s linear',
+  },
+  button: {
+    backgroundColor: '#fff',
+  },
+  streetViewButton: {
+    position: 'absolute',
+    bottom: 0,
+  },
+  textInput: {
+    borderRadius: 5,
+    border: '1px solid #000',
+    marginBottom: 5,
+    marginTop: 5,
+    paddingLeft: 5,
+    width: '200px ',
   },
   map: {
     position: 'absolute',
@@ -28,7 +63,25 @@ const classes = {
   },
   modal: {
     position: 'absolute',
+    zIndex: 50,
+    width: '100vw',
+    height: '100vh',
+    overflow: 'auto',
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    display: 'flex',
+    justifyContent: 'center',
   },
+  modalContent: {
+    backgroundColor: '#fefefe',
+    margin: 'auto',
+    top: '40%',
+    padding: '20px',
+    borderRadius: '25px',
+    width: '50%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  }
 };
 
 export default function Index() {
@@ -51,7 +104,7 @@ export default function Index() {
   }, [placeA, placeB]);
 
   return (
-    <div>
+    <div style={classes.root}>
       <Head>
         <link
           rel="stylesheet"
@@ -67,26 +120,30 @@ export default function Index() {
         ></script>
       </Head>
       <div style={classes.page}>
-        {!toggleMap && (<div style={classes.logo} />)}
-
-        <div style={classes.inputs}>
+        <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
+          {!toggleMap && (<div style={classes.logo} />)}
           <AutoCompleteInput
             value={placeA}
             handleChange={setPlaceA}
+            style={classes.textInput}
           />
           <AutoCompleteInput
             value={placeB}
             handleChange={setPlaceB}
+            style={classes.textInput}
           />
+
+          {!toggleMap && (
+            <button
+              type="button"
+              style={classes.button}
+              onClick={() => setToggleMap(!toggleMap)}
+            >
+              Select Location from Map
+            </button>
+          )}
         </div>
 
-        {!toggleMap && (
-          <Button
-            onClick={() => setToggleMap(!toggleMap)}
-          >
-            Click to view map
-          </Button>
-        )}
         {toggleMap && (
           <Map
             style={classes.map}
@@ -97,10 +154,13 @@ export default function Index() {
             fastestRoute={fastestRoute}
           />
         )}
-        
+
         {fetchingData && (
           <div style={classes.modal}>
-            Loading
+            <div style={classes.modalContent}>
+              <p>Calculating...</p>
+              <CircularProgress />
+            </div>
           </div>
         )}
       </div>
