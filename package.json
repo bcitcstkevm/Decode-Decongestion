@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --watch server server/index.js",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "buildstart": "npm run build && npm run start",
     "kevin": "node ./server/googleDirectionsApi.js",
     "kev2": "node ./server/safetify.js"
