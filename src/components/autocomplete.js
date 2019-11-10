@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Autocomplete } from '@react-google-maps/api';
-// import { TextField, makeStyles } from '@material-ui/core';
-
-// const useStyles = makeStyles({
-//   textField: {
-//   // css if required
-//   },
-// });
+import { Close } from '@material-ui/icons';
 
 export default class AutoCompleteInput extends Component {
   constructor(props) {
@@ -36,7 +30,7 @@ export default class AutoCompleteInput extends Component {
   }
 
   render() {
-    const { value, handleChange } = this.props;
+    const { value, handleChange, style } = this.props;
     return (
       <Autocomplete
         onLoad={this.onLoad}
@@ -45,22 +39,18 @@ export default class AutoCompleteInput extends Component {
         <input
           value={value.name}
           onChange={(e) => handleChange({ name: e.target.value })}
+          style={style}
         />
-        {/* <TextField
-          value={value.name}
-          onChange={(e) => handleChange({ name: e.target.value })}
-          // className={classes.textField}
-          variant="outlined"
-          margin="dense"
-        /> */}
       </Autocomplete>
     );
-  };
-
+  }
 }
 
 
 AutoCompleteInput.propTypes = {
-  value: PropTypes.shape({}).isRequired,
+  value: PropTypes.shape({
+    name: PropTypes.string,
+  }).isRequired,
   handleChange: PropTypes.func.isRequired,
+  style: PropTypes.shape({}).isRequired,
 };

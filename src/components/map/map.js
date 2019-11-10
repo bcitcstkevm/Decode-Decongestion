@@ -7,6 +7,32 @@ import { computeHeading } from 'spherical-geometry-js';
 
 const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
 
+const classes = {
+  streetViewButton: {
+    position: 'absolute',
+    bottom: '12px',
+    zIndex: 20,
+    width: '100px',
+    left: '50%',
+    marginLeft: '-50px',
+    backgroundColor: '#fff',
+    border: '1px solid black',
+    borderRadius: '10px',
+  },
+  previousButton: {
+    position: 'absolute',
+    zIndex: 20,
+    top: '50%',
+    left: '0px',
+  },
+  nextButton: {
+    position: 'absolute',
+    zIndex: 20,
+    top: '50%',
+    right: '0px',
+  },
+};
+
 export default class Map extends React.Component {
   constructor(props) {
     super(props);
@@ -110,13 +136,36 @@ export default class Map extends React.Component {
   }
 
   render() {
-    const { mobiBikes, infoBox } = this.state;
+    const { mobiBikes, infoBox, streetViewVisibility } = this.state;
     const { placeA, placeB, style, fastestRoute } = this.props;
     return (
-      <div>
-        <button onClick={this.nextStreetViewPosition.bind(this)}>Next</button>
-        <button onClick={this.prevStreetViewPosition.bind(this)}>Prev</button>
-        <button onClick={this.toggleStreetView.bind(this)}>Street View</button>
+      <div style={style}>
+        {streetViewVisibility && (
+          <>
+            <button
+              style={classes.nextButton}
+              onClick={this.nextStreetViewPosition.bind(this)}
+            >
+              Next
+            </button>
+            <button
+              style={classes.previousButton}
+              onClick={this.prevStreetViewPosition.bind(this)}
+            >
+              Prev
+            </button>
+          </>
+        )}
+
+        {Boolean(fastestRoute.length) && (
+          <button
+            type="button"
+            style={classes.streetViewButton}
+            onClick={this.toggleStreetView.bind(this)}
+          >
+            Street View
+          </button>
+        )}
         <GoogleMap
           id="map"
           mapContainerStyle={style}
