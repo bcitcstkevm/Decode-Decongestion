@@ -21,6 +21,7 @@ const classes = {
     // border: '1px solid #000',
     // width: '200px ',
     backgroundColor: '#fff',
+    fontFamily: 'Roboto Mono, monospace',
   },
   closeButton: {
     cursor: 'pointer',

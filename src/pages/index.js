@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, FormControlLabel, Checkbox } from '@material-ui/core';
 import { DirectionsBike, Map } from '@material-ui/icons';
 
 import AutoCompleteInput from '../components/autocomplete';
@@ -29,6 +29,10 @@ const classes = {
     // backgroundColor: 'black',
     width: '200px',
     height: '200px',
+    fontSize: '2rem',
+    marginBottom: '3rem',
+    textAlign: 'center',
+    fontFamily: 'Roboto Mono, monospace',
   },
   inputs: {
     zIndex: 13,
@@ -53,6 +57,9 @@ const classes = {
     top: 0,
     left: 'calc(50%-200px)',
     transition: 'top .3s linear',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#fff',
@@ -60,6 +67,7 @@ const classes = {
     marginTop: '10px',
     border: '1px solid black',
     borderRadius: '10px',
+    fontFamily: 'Roboto Mono, monospace',
   },
   streetViewButton: {
     position: 'absolute',
@@ -92,12 +100,21 @@ const classes = {
     flexDirection: 'column',
     alignItems: 'center',
   },
+  checkSafestContainer: {
+    textAlign: 'center',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 15,
+  },
+  formControl: {
+    margin: 0,
+  },
 };
 
 export default function Index() {
   const [placeA, setPlaceA] = useState({ name: '' });
   const [placeB, setPlaceB] = useState({ name: '' });
   const [toggleMap, setToggleMap] = useState(false);
+  const [checkedSafest, setCheckedSafest] = useState(false);
 
   const [fetchingData, setFetchingData] = useState(false);
   const [fastestRoute, setFastestRoute] = useState([]);
@@ -129,6 +146,7 @@ export default function Index() {
           type="text/javascript"
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA&libraries=geometry,places"
         ></script>
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet"></link>
       </Head>
       <div style={classes.page}>
         {!toggleMap && (
@@ -138,7 +156,8 @@ export default function Index() {
           <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
             {!toggleMap && (
               <div style={classes.logo}>
-                <DirectionsBike style={{ width: 200, height: 200, }} />
+                <DirectionsBike style={{ width: 200, height: 200 }} />
+                <p>Bike2Go</p>
               </div>
             )}
 
@@ -146,16 +165,33 @@ export default function Index() {
               value={placeA}
               handleChange={setPlaceA}
               style={classes.textInput}
-              placeholder="Enter starting location"
+              placeholder="Enter origin"
               clearRoute={() => setFastestRoute([])}
             />
             <AutoCompleteInput
               value={placeB}
               handleChange={setPlaceB}
               style={classes.textInput}
-              placeholder="Enter ending location"
+              placeholder="Enter destination"
               clearRoute={() => setFastestRoute([])}
             />
+
+            {toggleMap && Boolean(fastestRoute.length) && (
+              <div style={classes.checkSafestContainer}>
+                <FormControlLabel
+                  style={classes.formControl}
+                  control={(
+                    <Checkbox
+                      checked={checkedSafest}
+                      onChange={() => setCheckedSafest(!checkedSafest)}
+                      value={checkedSafest}
+                      color="primary"
+                    />
+                  )}
+                  label="Safest Route?"
+                />
+              </div>
+            )}
 
             {!toggleMap && (
               <button
