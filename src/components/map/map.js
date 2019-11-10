@@ -98,21 +98,40 @@ export default class GoogleMapComp extends React.Component {
       ],
       current_position: 0,
       center: INITIAL_CENTER,
-      streetViewVisibility: false,
       mobiEnable: true,
       infoBox: null,
       mq: window.matchMedia( "(max-width: 570px)" ).matches,
+      isAutoplay: false,
     };
     this.mapRef;
+    this.timerRef;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidMount() {
+    getMobi((result) => {
+      this.setState({
+        mobiBikes: result,
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
     if (
       this.props.fastestRoute &&
-      prevProps &&
+      prevProps.fastestRoute &&
       JSON.stringify(prevProps.fastestRoute) !== JSON.stringify(this.props.fastestRoute)
     ) {
       this.parseCoord(this.props.fastestRoute);
+    }
+
+    if ((prevState.isAutoplay && !this.state.isAutoplay) || this.state.current_position === this.state.positions.length-1) {
+      if (this.timerRef) {
+        clearInterval(this.timerRef)
+      }
+    } else if (!prevState.isAutoplay && this.state.isAutoplay) {
+      this.timerRef = setInterval(() => {
+        this.nextStreetViewPosition()
+      }, 3000)
     }
   }
 
@@ -142,15 +161,10 @@ export default class GoogleMapComp extends React.Component {
 
   toggleStreetView() {
     const { streetView, handleStreetView } = this.props;
+    if (streetView) {
+      this.setState({ isAutoplay: false })
+    }
     handleStreetView(!streetView);
-  }
-
-  componentDidMount() {
-    getMobi((result) => {
-      this.setState({
-        mobiBikes: result,
-      });
-    });
   }
 
   handleClick(e) {
@@ -223,6 +237,10 @@ export default class GoogleMapComp extends React.Component {
     });
   };
 
+  handleAutoPlay() {
+    this.setState({ isAutoplay: !this.state.isAutoplay })
+  }
+
   render() {
     const { mobiBikes, infoBox, current_position, mobiEnable, mq } = this.state;
     const { placeA, placeB, style, fastestRoute, streetView } = this.props;
@@ -280,7 +298,7 @@ export default class GoogleMapComp extends React.Component {
             </IconButton>
           </>
         )}
-
+        <button onClick={this.handleAutoPlay.bind(this)}>asdasd</button>
         {!streetView && (
           <div className={mobiEnable ? classes.mobiEnable : classes.mobiDisable} onClick={this.handleMobiEnable.bind(this)}>
             <img style={mq ? classes.mobiIcon : classes.desktopMobi} src="https://www.mobibikes.ca/sites/all/themes/smoove_bootstrap/images/icon_guidon_ride.svg" />
