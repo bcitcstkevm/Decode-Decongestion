@@ -7,11 +7,11 @@ import StreetView from './streetview';
 import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
 import { IconButton, Button } from '@material-ui/core';
 import {
-  ChevronLeft, ChevronRight, Accessibility, Map,
+  ChevronLeft, ChevronRight, Accessibility, Map, Pause, PlayArrow,
 } from '@material-ui/icons';
 import Minimap from './minimap'
 
-const INITIAL_CENTER = { lat: 49.2577143, lng: -123.1939432 };
+const INITIAL_CENTER = { lat: 49.260981, lng: -123.114354 };
 
 const classes = {
   streetViewButton: {
@@ -25,6 +25,8 @@ const classes = {
     border: '1px solid black',
     borderRadius: '10px',
     display: 'flex',
+    fontFamily: 'Roboto Mono, monospace',
+    textTransform: 'capitalize',
   },
   previousButton: {
     position: 'absolute',
@@ -46,8 +48,8 @@ const classes = {
     zIndex: 11,
     // top: 0,
     borderRadius: 100,
-    width: '20vw',
-    height: '20vw',
+    width: '17vw',
+    height: '17vw',
     border: '1px solid black',
   },
   desktopMobi: {
@@ -80,6 +82,20 @@ const classes = {
     zIndex: 11,
     left: '50%',
     marginLeft: '-20vw',
+  },
+  pausePlay: {
+    backgroundColor: '#fff',
+    border: '1px solid black',
+    borderRadius: '25px',
+    position: 'absolute',
+    zIndex: 11,
+    bottom: '75px',
+    left: '50%',
+    marginLeft: '-50px',
+    width: '100px',
+  },
+  inPlay: {
+    color: 'rgb(0, 0, 0, 1)',
   },
 };
 
@@ -242,7 +258,7 @@ export default class GoogleMapComp extends React.Component {
   }
 
   render() {
-    const { mobiBikes, infoBox, current_position, mobiEnable, mq } = this.state;
+    const { mobiBikes, infoBox, current_position, mobiEnable, mq, isAutoplay } = this.state;
     const { placeA, placeB, style, fastestRoute, streetView } = this.props;
     return (
       <div style={style}>
@@ -251,20 +267,21 @@ export default class GoogleMapComp extends React.Component {
           <>
             <div
               style={mq ? {
-                backgroundColor: `rgb(${255 * fastestRoute[current_position].danger},${255 * (1 - fastestRoute[current_position].danger)},0)`,
+                backgroundColor: `rgba(${255 * fastestRoute[current_position].danger},${255 * Math.max((1 - fastestRoute[current_position].danger), 0.5)},0, ${0.5 + Math.min(0.4, fastestRoute[current_position].danger)})`,
                 position: 'absolute',
-                width: '40vw',
+                width: '55vw',
                 zIndex: 11,
                 left: '50%',
-                marginLeft: '-30vw',
+                marginLeft: '-45vw',
                 borderRadius: 20,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginTop: '10px',
+                fontFamily: 'Roboto Mono, monospace',
               } : {
-                backgroundColor: `rgb(${255 * fastestRoute[current_position].danger},${255 * (1 - fastestRoute[current_position].danger)},0)`,
+                backgroundColor: `rgba(${255 * fastestRoute[current_position].danger},${255 * Math.max((1 - fastestRoute[current_position].danger), 0.5)},0, ${0.5 + Math.min(0.4, fastestRoute[current_position].danger)})`,
                 position: 'absolute',
                 width: '200px',
                 height: '100px',
@@ -277,10 +294,11 @@ export default class GoogleMapComp extends React.Component {
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginTop: '10px',
+                fontFamily: 'Roboto Mono, monospace',
               }}
             >
-              <p>Danger Level: {fastestRoute[current_position].danger < 0.33 ? 'Low' : (fastestRoute[current_position].danger < 0.66 ? 'Medium' : 'High')}</p>
-              <p>Collision #: {fastestRoute[current_position].bikeCollisions}</p>
+              <p style={{ marginBottom: 0}}>Danger Level: {fastestRoute[current_position].danger < 0.33 ? 'Low' : (fastestRoute[current_position].danger < 0.66 ? 'Medium' : 'High')}</p>
+              <p style={{ marginBottom: 0}}>{fastestRoute[current_position].danger < 0.33 ? 'Enjoy!' : (fastestRoute[current_position].danger < 0.66 ? 'Caution!' : 'Be careful!!')}</p>
             </div>
             <IconButton
               style={classes.nextButton}
@@ -296,9 +314,25 @@ export default class GoogleMapComp extends React.Component {
             >
               <ChevronLeft />
             </IconButton>
+            {isAutoplay ? (
+              <button
+                onClick={this.handleAutoPlay.bind(this)}
+                style={classes.pausePlay}
+              >
+                <Pause style={classes.inPlay} />
+              </button>
+              
+            ) : (
+              <button
+                onClick={this.handleAutoPlay.bind(this)}
+                style={classes.pausePlay}
+              >
+                <PlayArrow style={classes.inPlay} />
+              </button>
+            )}
           </>
         )}
-        <button onClick={this.handleAutoPlay.bind(this)}>asdasd</button>
+        
         {!streetView && (
           <div className={mobiEnable ? classes.mobiEnable : classes.mobiDisable} onClick={this.handleMobiEnable.bind(this)}>
             <img style={mq ? classes.mobiIcon : classes.desktopMobi} src="https://www.mobibikes.ca/sites/all/themes/smoove_bootstrap/images/icon_guidon_ride.svg" />
@@ -331,7 +365,7 @@ export default class GoogleMapComp extends React.Component {
           id="map"
           mapContainerStyle={style}
           center={INITIAL_CENTER}
-          zoom={12}
+          zoom={13}
           onClick={this.handleClick.bind(this)}
           onLoad={(ref) => {
             this.mapRef = ref;
@@ -359,7 +393,7 @@ export default class GoogleMapComp extends React.Component {
                   ]}
                   onClick={(e) => this.handleLineClick(e, line)}
                   options={{
-                    strokeColor: `rgb(${255 * line.danger}, ${255 * (1 - line.danger)}, 0)`,
+                    strokeColor: `rgb(${255 * line.danger}, ${255 * Math.max((1 - line.danger), 0.5)}, 0)`,
                   }}
                 />
               );
@@ -388,11 +422,18 @@ export default class GoogleMapComp extends React.Component {
               position={{ lat: infoBox.lat, lng: infoBox.lng }}
               onCloseClick={() => this.setState({ infoBox: null })}
             >
-              <div style={{ backgroundColor: 'yellow', opacity: 0.75, padding: 12 }}>
-                <div style={{ fontSize: 16, fontColor: `#08233B` }}>
-                  <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
-                  <span>Fatalities: {infoBox.line.fatalities}</span>
-                </div>
+              <div style={{
+                backgroundColor: `rgb(${255 * infoBox.line.danger}, ${255 * Math.max((1 - infoBox.line.danger), 0.5)}, 0)`,
+                opacity: 0.75,
+                padding: 12,
+                fontSize: 16,
+                fontColor: `#08233B`,
+                display: 'flex',
+                flexDirection: 'column',
+                
+              }}>
+                <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
+                <span>Fatalities: {infoBox.line.fatalities}</span>
               </div>
             </InfoWindow>
           )}

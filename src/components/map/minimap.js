@@ -47,7 +47,7 @@ export default class Minimap extends React.Component {
                 { lat: end_location.lat, lng: end_location.lng },
               ]}
               options={{
-                strokeColor: `rgb(${255 * line.danger}, ${255 * (1 - line.danger)}, 0)`,
+                strokeColor: `rgb(${255 * line.danger}, ${255 * Math.max((1 - line.danger), 0.5)}, 0)`,
               }}
             />
             );
