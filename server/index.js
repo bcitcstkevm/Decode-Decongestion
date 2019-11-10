@@ -52,7 +52,7 @@ app
 
     server.listen(PORT, (err) => {
       if (err) throw err;
-      console.log('> Ready on http://localhost:',PORT);
+      console.log('> Ready, check on http://localhost:',PORT);
     });
   })
   .catch((ex) => {
