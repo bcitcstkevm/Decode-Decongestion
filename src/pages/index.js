@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { CircularProgress } from '@material-ui/core';
+import { DirectionsBike, Map } from '@material-ui/icons';
 
 import AutoCompleteInput from '../components/autocomplete';
-import Map from '../components/map/map';
+import MapComp from '../components/map/map';
 import { getEfficientPath } from '../utils';
 
 const classes = {
@@ -21,10 +22,11 @@ const classes = {
     // margin: '30%',
     // maxHeight: '100%',
     height: '100%',
+    // backgroundImage: `url('${'https://images.pexels.com/photos/1630885/pexels-photo-1630885.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260'}')`,
     // transition: 'flex-start 1000ms linear',
   },
   logo: {
-    backgroundColor: 'black',
+    // backgroundColor: 'black',
     width: '200px',
     height: '200px',
   },
@@ -32,6 +34,18 @@ const classes = {
     zIndex: 13,
     position: 'absolute',
     top: '30%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  image: {
+    position: 'absolute',
+    // position: 'relative',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    opacity: '60%',
   },
   inputsMoved: {
     zIndex: 13,
@@ -42,6 +56,10 @@ const classes = {
   },
   button: {
     backgroundColor: '#fff',
+    alignItems: 'center',
+    marginTop: '10px',
+    border: '1px solid black',
+    borderRadius: '10px',
   },
   streetViewButton: {
     position: 'absolute',
@@ -73,7 +91,7 @@ const classes = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-  }
+  },
 };
 
 export default function Index() {
@@ -113,18 +131,30 @@ export default function Index() {
         ></script>
       </Head>
       <div style={classes.page}>
+        {!toggleMap && (
+          <img style={classes.image} src="https://images.pexels.com/photos/1630885/pexels-photo-1630885.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260" />
+        )}
         {!streetView && (
           <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
-            {!toggleMap && (<div style={classes.logo} />)}
+            {!toggleMap && (
+              <div style={classes.logo}>
+                <DirectionsBike style={{ width: 200, height: 200, }} />
+              </div>
+            )}
+
             <AutoCompleteInput
               value={placeA}
               handleChange={setPlaceA}
               style={classes.textInput}
+              placeholder="Enter starting location"
+              clearRoute={() => setFastestRoute([])}
             />
             <AutoCompleteInput
               value={placeB}
               handleChange={setPlaceB}
               style={classes.textInput}
+              placeholder="Enter ending location"
+              clearRoute={() => setFastestRoute([])}
             />
 
             {!toggleMap && (
@@ -134,13 +164,14 @@ export default function Index() {
                 onClick={() => setToggleMap(!toggleMap)}
               >
                 Select Location from Map
+                <Map />
               </button>
             )}
           </div>
         )}
 
         {toggleMap && (
-          <Map
+          <MapComp
             style={classes.map}
             placeA={placeA}
             placeB={placeB}
