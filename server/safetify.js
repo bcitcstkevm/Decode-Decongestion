@@ -1,6 +1,7 @@
 /* eslint-disable */
 
-const API_KEY = '5b3b85e2e5ef912d9e1c24011e5796a0232d47671a1c7a90b14ebcae';
+const API_KEY = process.env.SAFETY_API_KEY;
+console.log('SAFETY_KEY: ', API_KEY);
 const API_PATH = `https://decode-congestion-vancouver.opendatasoft.com/api/records/1.0/search/`;
 const axios = require('axios');
 const testdata = require('./testdata');
@@ -109,8 +110,8 @@ class Safetify {
   }
 
   aggregateDangers() {
-    const collisionWeight = (1/7);
-    const deathWeight = (6/7);
+    const collisionWeight = 1 / 7;
+    const deathWeight = 6 / 7;
 
     this.arrOfSteps.forEach((step) => {
       try {
@@ -120,7 +121,7 @@ class Safetify {
         if (!step.fatalities) {
           step.fatalities = 0;
         }
-        step.danger = (step.bikeCollisions * collisionWeight) + (step.fatalities * deathWeight);
+        step.danger = step.bikeCollisions * collisionWeight + step.fatalities * deathWeight;
       } catch (err) {}
     });
   }

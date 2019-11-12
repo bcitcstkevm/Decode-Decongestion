@@ -1,6 +1,7 @@
 /* eslint-disable */
 
-const API_KEY1 = process.env.GOOGLE_API;
+const API_KEY = process.env.GOOGLE_API;
+console.log('API_KEY1', API_KEY);
 const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
 const axios = require('axios');
 const safe = require('./safetify');
@@ -41,7 +42,7 @@ class googleDirectionsApi {
   getPath() {
     const o = `origin=${this.parseCoordinate(this.origin)}`;
     const d = `&destination=${this.parseCoordinate(this.destination)}`;
-    const key = `&key=${API_KEY1}`;
+    const key = `&key=${API_KEY}`;
     const mode = `&mode=${this.mode}`;
     const waypoints = this.getWayPoints();
     const alternatives = `&alternatives=true`;
