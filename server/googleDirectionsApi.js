@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 const API_KEY = process.env.GOOGLE_API;
-console.log('API_KEY1', API_KEY);
 const API_PATH = `https://maps.googleapis.com/maps/api/directions/json?`;
 const axios = require('axios');
 const safe = require('./safetify');

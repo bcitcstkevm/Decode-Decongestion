@@ -8,7 +8,6 @@ import MapComp from '../components/map/map';
 import { getEfficientPath, getSafest } from '../utils';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API;
-console.log('Frontend GOOGLE_API_KEY', GOOGLE_API_KEY);
 const GOOGLE_API_PATH = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
 
 const classes = {

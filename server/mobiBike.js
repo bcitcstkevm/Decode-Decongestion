@@ -3,7 +3,6 @@ const axios = require('axios');
 const url =
   'https://decode-congestion-vancouver.opendatasoft.com/api/records/1.0/search/?dataset=mobi-by-shaw-go-station-information';
 const apiKey = process.env.MOBI_DATA_API_KEY;
-console.log('MOBI KEY: ', apiKey);
 
 const getMobiBikeStation = async () => {
   const stationData = [];

@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 const API_KEY = process.env.SAFETY_API_KEY;
-console.log('SAFETY_KEY: ', API_KEY);
 const API_PATH = `https://decode-congestion-vancouver.opendatasoft.com/api/records/1.0/search/`;
 const axios = require('axios');
 const testdata = require('./testdata');
