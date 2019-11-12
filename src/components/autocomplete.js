@@ -53,7 +53,9 @@ export default class AutoCompleteInput extends Component {
   }
 
   render() {
-    const { value, handleChange, placeholder, clearRoute } = this.props;
+    const {
+      value, handleChange, placeholder, clearRoute,
+    } = this.props;
     return (
       <Autocomplete
         onLoad={this.onLoad}

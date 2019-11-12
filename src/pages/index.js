@@ -159,17 +159,18 @@ export default function Index() {
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
           crossOrigin="anonymous"
-        ></link>
-        <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.css"></link>
-        <script type="text/javascript" src={GOOGLE_API_PATH}></script>
-        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet"></link>
+        />
+        <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.js" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.css" />
+        <script type="text/javascript" src={GOOGLE_API_PATH} />
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet" />
       </Head>
       <div style={classes.page}>
         {!toggleMap && (
           <img
             style={classes.image}
             src="https://images.pexels.com/photos/1630885/pexels-photo-1630885.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260"
+            alt="background"
           />
         )}
         {!streetView && (
@@ -200,14 +201,14 @@ export default function Index() {
               <div style={classes.checkSafestContainer}>
                 <FormControlLabel
                   style={classes.formControl}
-                  control={
+                  control={(
                     <Checkbox
                       checked={checkedSafest}
                       onChange={checkSafestRoute}
                       value={checkedSafest}
                       color="primary"
                     />
-                  }
+                  )}
                   label="Safest Route?"
                 />
               </div>

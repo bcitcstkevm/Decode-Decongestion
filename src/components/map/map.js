@@ -1,15 +1,17 @@
-/* eslint-disable */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GoogleMap, Marker, Polyline, Circle, InfoWindow } from '@react-google-maps/api';
-import { getMobi } from '../../utils';
-import StreetView from './streetview';
-import { computeHeading, interpolate, LatLng } from 'spherical-geometry-js';
+import {
+  GoogleMap, Marker, Polyline, Circle, InfoWindow,
+} from '@react-google-maps/api';
+
+import { computeHeading } from 'spherical-geometry-js';
 import { IconButton, Button } from '@material-ui/core';
 import {
   ChevronLeft, ChevronRight, Accessibility, Map, Pause, PlayArrow,
 } from '@material-ui/icons';
-import Minimap from './minimap'
+import Minimap from './minimap';
+import { getMobi } from '../../utils';
+import StreetView from './streetview';
 
 const INITIAL_CENTER = { lat: 49.260981, lng: -123.114354 };
 
@@ -116,7 +118,7 @@ export default class GoogleMapComp extends React.Component {
       center: INITIAL_CENTER,
       mobiEnable: true,
       infoBox: null,
-      mq: window.matchMedia( "(max-width: 570px)" ).matches,
+      mq: window.matchMedia('(max-width: 570px)').matches,
       isAutoplay: false,
     };
     this.mapRef;
@@ -132,32 +134,33 @@ export default class GoogleMapComp extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const { fastestRoute } = this.props;
+    const { fastestRoute: prevFastestRoute } = prevProps;
+    const { isAutoplay, current_position, positions } = this.state;
     if (
-      this.props.fastestRoute &&
-      prevProps.fastestRoute &&
-      JSON.stringify(prevProps.fastestRoute) !== JSON.stringify(this.props.fastestRoute)
+      fastestRoute
+      && prevFastestRoute
+      && JSON.stringify(prevFastestRoute) !== JSON.stringify(fastestRoute)
     ) {
-      this.parseCoord(this.props.fastestRoute);
+      this.parseCoord(fastestRoute);
     }
 
-    if ((prevState.isAutoplay && !this.state.isAutoplay) || this.state.current_position === this.state.positions.length-1) {
+    if ((prevState.isAutoplay && !isAutoplay) || current_position === positions.length - 1) {
       if (this.timerRef) {
-        clearInterval(this.timerRef)
+        clearInterval(this.timerRef);
       }
-    } else if (!prevState.isAutoplay && this.state.isAutoplay) {
+    } else if (!prevState.isAutoplay && isAutoplay) {
       this.timerRef = setInterval(() => {
-        this.nextStreetViewPosition()
-      }, 3000)
+        this.nextStreetViewPosition();
+      }, 3000);
     }
   }
 
   nextStreetViewPosition() {
-    console.log('state', this.state);
-
-    const newPosition =
-      this.state.current_position + 1 > this.state.positions.length - 1
-        ? this.state.positions.length - 1
-        : this.state.current_position + 1;
+    const { current_position, positions } = this.state;
+    const newPosition = current_position + 1 > positions.length - 1
+      ? positions.length - 1
+      : current_position + 1;
 
     this.setState((prevState) => {
       return {
@@ -168,11 +171,9 @@ export default class GoogleMapComp extends React.Component {
   }
 
   prevStreetViewPosition() {
-    console.log('state', this.state);
-    let newPosition = this.state.current_position - 1 < 0 ? 0 : this.state.current_position - 1;
-    this.setState((prevState) => {
-      return { ...prevState, current_position: prevState.current_position - 1 };
-    });
+    this.setState((prevState) => ({
+      ...prevState, current_position: prevState.current_position - 1,
+    }));
   }
 
   toggleStreetView() {
@@ -186,16 +187,18 @@ export default class GoogleMapComp extends React.Component {
   handleClick(e) {
     const lat = e.latLng.lat();
     const lng = e.latLng.lng();
-    const { placeA, placeB } = this.props;
+    const {
+      placeA, placeB, setPlaceA, setPlaceB,
+    } = this.props;
     this.setState({ infoBox: null });
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
       return;
     }
 
     if (Object.keys(placeA).length !== 3) {
-      this.props.setPlaceA({ name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng });
+      setPlaceA({ name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng });
     } else {
-      this.props.setPlaceB({ name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng });
+      setPlaceB({ name: `${lat.toFixed(3)}, ${lng.toFixed(3)}`, lat, lng });
     }
   }
 
@@ -209,7 +212,6 @@ export default class GoogleMapComp extends React.Component {
         line,
       },
     });
-    console.log(line);
   }
 
   // interpolatepoints(data, fraction) {
@@ -229,20 +231,19 @@ export default class GoogleMapComp extends React.Component {
 
   parseCoord(data) {
     let i = 0;
-    let route = [];
+    const route = [];
     if (data && data.length > 1) {
-      for (i = 0; i < data.length - 1; i++) {
+      for (i = 0; i < data.length - 1; i += 1) {
         route.push(data[i].start_location);
       }
       route.push(data[i].end_location);
       // route = this.interpolatepoints(route, 0.1);
-      for (i = 0; i < route.length - 1; i++) {
+      for (i = 0; i < route.length - 1; i += 1) {
         const heading = computeHeading(route[i], route[i + 1]);
-        route[i]['heading'] = heading;
+        route[i].heading = heading;
       }
-      route[i]['heading'] = route[i - 1]['heading'];
+      route[i].heading = route[i - 1].heading;
       this.setState({ positions: route });
-      console.log('route: ', route);
     }
   }
 
@@ -251,18 +252,23 @@ export default class GoogleMapComp extends React.Component {
     this.setState({
       mobiEnable: !mobiEnable,
     });
-  };
+  }
 
   handleAutoPlay() {
-    this.setState({ isAutoplay: !this.state.isAutoplay })
+    const { isAutoplay } = this.state;
+    this.setState({ isAutoplay: !isAutoplay });
   }
 
   render() {
-    const { mobiBikes, infoBox, current_position, mobiEnable, mq, isAutoplay } = this.state;
-    const { placeA, placeB, style, fastestRoute, streetView } = this.props;
+    const {
+      mobiBikes,
+      infoBox, current_position, mobiEnable, mq, isAutoplay, positions, streetViewHeading,
+    } = this.state;
+    const {
+      placeA, placeB, style, fastestRoute, streetView,
+    } = this.props;
     return (
       <div style={style}>
-        
         {streetView && (
           <>
             <div
@@ -297,8 +303,12 @@ export default class GoogleMapComp extends React.Component {
                 fontFamily: 'Roboto Mono, monospace',
               }}
             >
-              <p style={{ marginBottom: 0}}>Danger Level: {fastestRoute[current_position].danger < 0.33 ? 'Low' : (fastestRoute[current_position].danger < 0.66 ? 'Medium' : 'High')}</p>
-              <p style={{ marginBottom: 0}}>{fastestRoute[current_position].danger < 0.33 ? 'Enjoy!' : (fastestRoute[current_position].danger < 0.66 ? 'Caution!' : 'Be careful!!')}</p>
+              <p style={{ marginBottom: 0 }}>
+                {`Danger Level: ${fastestRoute[current_position].danger < 0.33 ? 'Low' : (fastestRoute[current_position].danger < 0.66 ? 'Medium' : 'High')}`}
+              </p>
+              <p style={{ marginBottom: 0 }}>
+                {`${fastestRoute[current_position].danger < 0.33 ? 'Enjoy!' : (fastestRoute[current_position].danger < 0.66 ? 'Caution!' : 'Be careful!!')}`}
+              </p>
             </div>
             <IconButton
               style={classes.nextButton}
@@ -318,24 +328,28 @@ export default class GoogleMapComp extends React.Component {
               <button
                 onClick={this.handleAutoPlay.bind(this)}
                 style={classes.pausePlay}
+                type="button"
               >
                 <Pause style={classes.inPlay} />
               </button>
-              
             ) : (
               <button
                 onClick={this.handleAutoPlay.bind(this)}
                 style={classes.pausePlay}
+                type="button"
               >
                 <PlayArrow style={classes.inPlay} />
               </button>
             )}
           </>
         )}
-        
         {!streetView && (
-          <div className={mobiEnable ? classes.mobiEnable : classes.mobiDisable} onClick={this.handleMobiEnable.bind(this)}>
-            <img style={mq ? classes.mobiIcon : classes.desktopMobi} src="https://www.mobibikes.ca/sites/all/themes/smoove_bootstrap/images/icon_guidon_ride.svg" />
+          <div
+            aria-hidden="true"
+            className={mobiEnable ? classes.mobiEnable : classes.mobiDisable}
+            onClick={this.handleMobiEnable.bind(this)}
+          >
+            <img style={mq ? classes.mobiIcon : classes.desktopMobi} src="https://www.mobibikes.ca/sites/all/themes/smoove_bootstrap/images/icon_guidon_ride.svg" alt="mobibikeicon" />
           </div>
         )}
         {Boolean(fastestRoute.length) && (
@@ -398,65 +412,82 @@ export default class GoogleMapComp extends React.Component {
                 />
               );
             })}
-          {mobiEnable && mobiBikes &&
-            mobiBikes.map((station, i) => {
-              const { geopoint } = station;
-              if (!geopoint) return;
-              const loc = {
-                lat: geopoint[0],
-                lng: geopoint[1],
-              };
-              return (
-                <Circle
-                  key={i}
-                  center={loc}
-                  radius={10}
-                  options={{
-                    strokeColor: 'rgb(0,169,221)',
-                  }}
-                />
-              );
-            })}
+          {mobiEnable && mobiBikes && mobiBikes.map((station, i) => {
+            const { geopoint } = station;
+            if (!geopoint) return null;
+            const loc = {
+              lat: geopoint[0],
+              lng: geopoint[1],
+            };
+            return (
+              <Circle
+                key={i}
+                center={loc}
+                radius={10}
+                options={{
+                  strokeColor: 'rgb(0,169,221)',
+                }}
+              />
+            );
+          })}
           {infoBox && (
             <InfoWindow
               position={{ lat: infoBox.lat, lng: infoBox.lng }}
               onCloseClick={() => this.setState({ infoBox: null })}
             >
-              <div style={{
-                backgroundColor: `rgb(${255 * infoBox.line.danger}, ${255 * Math.max((1 - infoBox.line.danger), 0.5)}, 0)`,
-                opacity: 0.75,
-                padding: 12,
-                fontSize: 16,
-                fontColor: `#08233B`,
-                display: 'flex',
-                flexDirection: 'column',
-                
-              }}>
-                <span>Bike Collisions: {infoBox.line.bikeCollisions}</span>
-                <span>Fatalities: {infoBox.line.fatalities}</span>
+              <div
+                style={{
+                  backgroundColor: `rgb(${255 * infoBox.line.danger}, ${255 * Math.max((1 - infoBox.line.danger), 0.5)}, 0)`,
+                  opacity: 0.75,
+                  padding: 12,
+                  fontSize: 16,
+                  fontColor: '#08233B',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <span>
+                  {`Bike Collisions: ${infoBox.line.bikeCollisions}`}
+                </span>
+                <span>
+                  {`Fatalities: ${infoBox.line.fatalities}`}
+                </span>
               </div>
             </InfoWindow>
           )}
           <StreetView
-            currentPosition={this.state.current_position}
-            positions={this.state.positions}
+            currentPosition={current_position}
+            positions={positions}
             visbility={streetView}
-            heading={this.state.streetViewHeading}
+            heading={streetViewHeading}
           />
         </GoogleMap>
-        {streetView && <Minimap 
-          fastestRoute={fastestRoute}
-          currentPosition={this.state.current_position}
-        />}
+        {streetView && (
+          <Minimap
+            fastestRoute={fastestRoute}
+            currentPosition={current_position}
+          />
+        )}
       </div>
     );
   }
 }
 
-Map.propTypes = {
-  placeA: PropTypes.shape({}).isRequired,
-  placeB: PropTypes.shape({}).isRequired,
+GoogleMapComp.propTypes = {
+  placeA: PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }).isRequired,
+  placeB: PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }).isRequired,
   setPlaceA: PropTypes.func.isRequired,
   setPlaceB: PropTypes.func.isRequired,
-  fastestRoute: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  fastestRoute: PropTypes.arrayOf(PropTypes.shape({
+    danger: PropTypes.number,
+  })).isRequired,
+  streetView: PropTypes.bool.isRequired,
+  handleStreetView: PropTypes.func.isRequired,
+  style: PropTypes.shape({}).isRequired,
 };
