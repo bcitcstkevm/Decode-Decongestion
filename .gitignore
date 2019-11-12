@@ -1,3 +1,9 @@
+# mac stuff
+.DS_Store
+
+# environmental file
+.env
+
 # Build and Release Folders
 bin-debug/
 bin-release/

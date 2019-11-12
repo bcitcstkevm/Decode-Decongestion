@@ -1,5 +1,6 @@
 /* eslint-disable */
 
+require('dotenv').config();
 const express = require('express');
 const next = require('next');
 
@@ -8,7 +9,7 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const gda = require('./googleDirectionsApi');
-const mobi = require('./mobiBike')
+const mobi = require('./mobiBike');
 
 app
   .prepare()
@@ -18,10 +19,10 @@ app
     const gdaobj = new gda();
 
     server.get('/api/getMobi', (req, res) => {
-      mobi.getMobiBikeStation().then(result => {
-        res.send(result)
-      })
-    })
+      mobi.getMobiBikeStation().then((result) => {
+        res.send(result);
+      });
+    });
 
     server.get('/efficient', (req, res) => {
       const origin = {
@@ -39,9 +40,9 @@ app
       gdaobj.setCVars(origin, dest);
       // mode and waypoints are optional
       //result is an array of objects. each object is a step
-      gdaobj.getListOfDirectionsForEfficient().then(result => {
-        res.send(result)
-      })
+      gdaobj.getListOfDirectionsForEfficient().then((result) => {
+        res.send(result);
+      });
     });
 
     server.get('/safest', (req, res) => {
@@ -60,22 +61,20 @@ app
       gdaobj.setCVars(origin, dest);
       // mode and waypoints are optional
       //result is an array of objects. each object is a step
-      gdaobj.getListOfDirectionsForSafest().then(result => {
-        res.send(result)
-      })
+      gdaobj.getListOfDirectionsForSafest().then((result) => {
+        res.send(result);
+      });
     });
-
-  
 
     server.get('*', (req, res) => {
       return handle(req, res);
     });
 
-    const PORT = process.env.PORT || 3000
+    const PORT = process.env.PORT || 3000;
 
     server.listen(PORT, (err) => {
       if (err) throw err;
-      console.log('> Ready, check on http://localhost:',PORT);
+      console.log(`> Ready, check on http://localhost:${PORT}`);
     });
   })
   .catch((ex) => {

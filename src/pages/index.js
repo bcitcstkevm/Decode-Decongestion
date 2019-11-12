@@ -7,6 +7,9 @@ import AutoCompleteInput from '../components/autocomplete';
 import MapComp from '../components/map/map';
 import { getEfficientPath, getSafest } from '../utils';
 
+const GOOGLE_API_KEY = process.env.GOOGLE_API;
+const GOOGLE_API_PATH = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+
 const classes = {
   root: {
     height: '100vh',
@@ -123,11 +126,11 @@ export default function Index() {
 
   const checkSafestRoute = () => {
     if (!checkedSafest) {
-      setFetchingData(true)
-      getSafest(placeA, placeB, result => {
+      setFetchingData(true);
+      getSafest(placeA, placeB, (result) => {
         setFetchingData(false);
         setFastestRoute(result);
-      })
+      });
     }
     setCheckedSafest(!checkedSafest);
   };
@@ -135,17 +138,16 @@ export default function Index() {
   useEffect(() => {
     if (Object.keys(placeA).length === 3 && Object.keys(placeB).length === 3) {
       setSafestMessage(false);
-      setToggleMap(true)
-      setFetchingData(true)
-      getEfficientPath(placeA, placeB, result => {
-        setFetchingData(false)
-        setFastestRoute(result.result)
+      setToggleMap(true);
+      setFetchingData(true);
+      getEfficientPath(placeA, placeB, (result) => {
+        setFetchingData(false);
+        setFastestRoute(result.result);
         if (result.length === 1) {
           setSafestMessage(true);
           setCheckedSafest(true);
-
         }
-      })
+      });
     }
   }, [placeA, placeB]);
 
@@ -160,15 +162,15 @@ export default function Index() {
         ></link>
         <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.4/build/pannellum.css"></link>
-        <script
-          type="text/javascript"
-          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdgZKoxkdZjb92G7aMvEiJYiegd9n6rbA&libraries=geometry,places"
-        ></script>
+        <script type="text/javascript" src={GOOGLE_API_PATH}></script>
         <link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet"></link>
       </Head>
       <div style={classes.page}>
         {!toggleMap && (
-          <img style={classes.image} src="https://images.pexels.com/photos/1630885/pexels-photo-1630885.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260" />
+          <img
+            style={classes.image}
+            src="https://images.pexels.com/photos/1630885/pexels-photo-1630885.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260"
+          />
         )}
         {!streetView && (
           <div style={toggleMap ? classes.inputsMoved : classes.inputs}>
@@ -198,25 +200,21 @@ export default function Index() {
               <div style={classes.checkSafestContainer}>
                 <FormControlLabel
                   style={classes.formControl}
-                  control={(
+                  control={
                     <Checkbox
                       checked={checkedSafest}
                       onChange={checkSafestRoute}
                       value={checkedSafest}
                       color="primary"
                     />
-                  )}
+                  }
                   label="Safest Route?"
                 />
               </div>
             )}
 
             {!toggleMap && (
-              <button
-                type="button"
-                style={classes.button}
-                onClick={() => setToggleMap(!toggleMap)}
-              >
+              <button type="button" style={classes.button} onClick={() => setToggleMap(!toggleMap)}>
                 Select Location from Map
                 <Map />
               </button>
